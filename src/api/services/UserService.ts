@@ -19,30 +19,54 @@ export class UserService {
      * @throws ApiError
      */
     public static userControllerGetUsers({
+        pageNo,
+        pageSize,
+        searchKey,
         role,
         department,
         designation,
+        search,
     }: {
+        /**
+         * Page number, starts from 1
+         */
+        pageNo: number,
+        /**
+         * Items per page
+         */
+        pageSize: number,
+        /**
+         * Optional free-text search term; can be null or empty
+         */
+        searchKey?: string,
         /**
          * Filter users by role IDs (comma-separated or array)
          */
-        role: Object,
+        role?: Object,
         /**
          * Filter users by department IDs (comma-separated or array)
          */
-        department: Object,
+        department?: Object,
         /**
          * Filter users by designation IDs (comma-separated or array)
          */
-        designation: Object,
+        designation?: Object,
+        /**
+         * Search keyword
+         */
+        search?: string,
     }): CancelablePromise<UsersListSuccessDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/user',
             query: {
+                'pageNo': pageNo,
+                'pageSize': pageSize,
+                'searchKey': searchKey,
                 'role': role,
                 'department': department,
                 'designation': designation,
+                'search': search,
             },
         });
     }
@@ -52,10 +76,20 @@ export class UserService {
      * @returns any
      * @throws ApiError
      */
-    public static userControllerGetUser(): CancelablePromise<UserSuccessDto> {
+    public static userControllerGetUser({
+        id,
+    }: {
+        /**
+         * The ID of the department to retrieve
+         */
+        id: string,
+    }): CancelablePromise<UserSuccessDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/user/{id}',
+            path: {
+                'id': id,
+            },
         });
     }
     /**

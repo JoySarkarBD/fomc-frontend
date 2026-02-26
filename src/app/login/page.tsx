@@ -3,31 +3,100 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { AuthenticationService } from "@/api";
+import { AuthenticationService, ApiError } from "@/api";
 
 export default function LoginPage() {
+  const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberPassword, setRememberPassword] = useState(false);
   const [isNotRobot, setIsNotRobot] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle login logic here
-    console.log({ email, password, rememberPassword, isNotRobot });
+  // ── Submission / error state ──────────────────────────────────────────
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
-   const result= AuthenticationService.authControllerLogin({
-      requestBody:{
-        email: email,
-        password: password
-      }
-    })
+  const clearErrors = () => {
+    setErrorMessage(null);
+    setFieldErrors({});
   };
+
+  // ── Submit handler ────────────────────────────────────────────────────
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    clearErrors();
+
+    // Basic client-side guard
+    if (!email.trim() || !password) {
+      setErrorMessage("Please enter your email and password.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const result = await AuthenticationService.authControllerLogin({
+        requestBody: { email: email.trim(), password },
+      });
+
+      // ── Success: extract token + user from response ───────────────────
+      const data = (result as { data?: { accessToken?: string; user?: Record<string, unknown> } }).data;
+      const token = data?.accessToken;
+      const user = data?.user;
+
+      if (token) {
+        // Persist token (localStorage so it survives refresh)
+        localStorage.setItem("accessToken", token);
+      }
+      if (user) {
+        localStorage.setItem("user", JSON.stringify(user));
+      }
+
+      // Redirect to dashboard
+      router.push("/");
+    } catch (err) {
+      if (err instanceof ApiError) {
+        const body = err.body as {
+          message?: string;
+          error?: string;
+          errors?: { field: string; message: string }[];
+        };
+
+        // 400 – Validation errors (field-level)
+        if (body?.errors && Array.isArray(body.errors)) {
+          const mapped: Record<string, string> = {};
+          for (const fe of body.errors) {
+            mapped[fe.field] = fe.message;
+          }
+          setFieldErrors(mapped);
+          setErrorMessage(body.message || "Validation failed. Please fix the errors below.");
+        }
+        // 401 – Invalid credentials
+        else if (err.status === 401) {
+          setErrorMessage(body?.message || "Invalid email or password.");
+        }
+        // 500 / other
+        else {
+          setErrorMessage(body?.message || body?.error || "Login failed. Please try again.");
+        }
+      } else {
+        setErrorMessage("Network error. Please check your connection and try again.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // ── Shared input class ────────────────────────────────────────────────
+  const inputClass =
+    "h-11 rounded-sm border-border bg-background text-sm focus-visible:ring-1 focus-visible:ring-[#044192]";
 
   return (
     <div className="min-h-screen w-full bg-linear-to-br from-[#044192] via-[#0a5eb8] to-[#1976d2] flex items-center justify-center p-4">
@@ -64,41 +133,56 @@ export default function LoginPage() {
           </p>
         </div>
 
+        {/* Global Error Message */}
+        {errorMessage && (
+          <div className="mb-4 rounded-sm border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {errorMessage}
+          </div>
+        )}
+
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Name Input */}
+          {/* Email Input */}
           <div>
             <Input
               type="email"
               placeholder="Email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="h-11 rounded-sm border-border bg-background text-sm focus-visible:ring-1 focus-visible:ring-[#044192]"
+              onChange={(e) => { setEmail(e.target.value); if (fieldErrors.email) setFieldErrors((p) => { const n = { ...p }; delete n.email; return n; }); }}
+              className={inputClass}
               required
             />
+            {fieldErrors.email && (
+              <p className="mt-1 text-xs text-red-600">{fieldErrors.email}</p>
+            )}
           </div>
 
           {/* Password Input */}
-          <div className="relative">
-            <Input
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="h-11 rounded-sm border-border bg-background pr-10 text-sm focus-visible:ring-1 focus-visible:ring-[#044192]"
-              required
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {showPassword ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
-            </button>
+          <div>
+            <div className="relative">
+              <Input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                value={password}
+                onChange={(e) => { setPassword(e.target.value); if (fieldErrors.password) setFieldErrors((p) => { const n = { ...p }; delete n.password; return n; }); }}
+                className={`${inputClass} pr-10`}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+            {fieldErrors.password && (
+              <p className="mt-1 text-xs text-red-600">{fieldErrors.password}</p>
+            )}
           </div>
 
           {/* Remember Password and Forget Password Row */}
@@ -158,12 +242,17 @@ export default function LoginPage() {
           <div className="max-w-sm mx-auto">
             <Button
               type="submit"
-              className="w-full h-11 rounded-sm bg-[#8FA3C1] hover:bg-[#044192] text-white font-medium text-sm transition-colors"
-              onClick={() => {
-                window.location.href = "/";
-              }}
+              disabled={isSubmitting}
+              className="w-full h-11 rounded-sm bg-[#8FA3C1] hover:bg-[#044192] text-white font-medium text-sm transition-colors disabled:opacity-60"
             >
-              Sign In
+              {isSubmitting ? (
+                <span className="flex items-center justify-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Signing In...
+                </span>
+              ) : (
+                "Sign In"
+              )}
             </Button>
           </div>
 

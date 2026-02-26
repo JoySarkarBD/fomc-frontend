@@ -19,7 +19,7 @@ export class RoleService {
      * @returns any
      * @throws ApiError
      */
-    public static roleControllerCreateRole({
+    public static roleControllerCreate({
         requestBody,
     }: {
         requestBody: CreateRoleDto,
@@ -37,10 +37,32 @@ export class RoleService {
      * @returns any
      * @throws ApiError
      */
-    public static roleControllerFindRoles(): CancelablePromise<RolesListSuccessDto> {
+    public static roleControllerFindAll({
+        pageNo,
+        pageSize,
+        searchKey = '',
+    }: {
+        /**
+         * The page number for pagination
+         */
+        pageNo: number,
+        /**
+         * The number of items per page for pagination
+         */
+        pageSize: number,
+        /**
+         * Search term to filter roles by name or description
+         */
+        searchKey?: string,
+    }): CancelablePromise<RolesListSuccessDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/role',
+            query: {
+                'pageNo': pageNo,
+                'pageSize': pageSize,
+                'searchKey': searchKey,
+            },
         });
     }
     /**
@@ -49,10 +71,20 @@ export class RoleService {
      * @returns any
      * @throws ApiError
      */
-    public static roleControllerFindRoleById(): CancelablePromise<RoleByIdSuccessDto> {
+    public static roleControllerFindOne({
+        id,
+    }: {
+        /**
+         * The ID of the department to retrieve
+         */
+        id: string,
+    }): CancelablePromise<RoleByIdSuccessDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/role/{id}',
+            path: {
+                'id': id,
+            },
         });
     }
     /**
@@ -61,14 +93,22 @@ export class RoleService {
      * @returns any
      * @throws ApiError
      */
-    public static roleControllerUpdateRoleById({
+    public static roleControllerUpdate({
+        id,
         requestBody,
     }: {
+        /**
+         * The ID of the department to retrieve
+         */
+        id: string,
         requestBody: UpdateRoleDto,
     }): CancelablePromise<RolePatchSuccessDto> {
         return __request(OpenAPI, {
             method: 'PATCH',
             url: '/api/role/{id}',
+            path: {
+                'id': id,
+            },
             body: requestBody,
             mediaType: 'application/json',
         });
@@ -79,10 +119,20 @@ export class RoleService {
      * @returns any
      * @throws ApiError
      */
-    public static roleControllerDeleteRoleById(): CancelablePromise<RoleDeleteSuccessDto> {
+    public static roleControllerRemove({
+        id,
+    }: {
+        /**
+         * The ID of the department to retrieve
+         */
+        id: string,
+    }): CancelablePromise<RoleDeleteSuccessDto> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/api/role/{id}',
+            path: {
+                'id': id,
+            },
         });
     }
 }

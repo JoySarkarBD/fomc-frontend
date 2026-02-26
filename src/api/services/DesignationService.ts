@@ -16,7 +16,7 @@ export class DesignationService {
      * @returns any
      * @throws ApiError
      */
-    public static designationControllerCreateDesignation({
+    public static designationControllerCreate({
         requestBody,
     }: {
         requestBody: CreateDesignationDto,
@@ -34,10 +34,32 @@ export class DesignationService {
      * @returns any
      * @throws ApiError
      */
-    public static designationControllerFindDesignations(): CancelablePromise<DesignationListSuccessDto> {
+    public static designationControllerFindAll({
+        pageNo,
+        pageSize,
+        searchKey = '',
+    }: {
+        /**
+         * The page number for pagination (1-based index)
+         */
+        pageNo: number,
+        /**
+         * The number of items per page (1-100)
+         */
+        pageSize: number,
+        /**
+         * Optional search term to filter designations
+         */
+        searchKey?: string,
+    }): CancelablePromise<DesignationListSuccessDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/designation',
+            query: {
+                'pageNo': pageNo,
+                'pageSize': pageSize,
+                'searchKey': searchKey,
+            },
         });
     }
     /**
@@ -46,10 +68,20 @@ export class DesignationService {
      * @returns any
      * @throws ApiError
      */
-    public static designationControllerFindDepartmentById(): CancelablePromise<DesignationSuccessDto> {
+    public static designationControllerFindOne({
+        id,
+    }: {
+        /**
+         * The ID of the designation to retrieve
+         */
+        id: string,
+    }): CancelablePromise<DesignationSuccessDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/designation/{id}',
+            path: {
+                'id': id,
+            },
         });
     }
     /**
@@ -58,14 +90,22 @@ export class DesignationService {
      * @returns any
      * @throws ApiError
      */
-    public static designationControllerUpdateDesignationById({
+    public static designationControllerUpdate({
+        id,
         requestBody,
     }: {
+        /**
+         * The ID of the designation to update
+         */
+        id: string,
         requestBody: UpdateDesignationDto,
     }): CancelablePromise<DesignationSuccessDto> {
         return __request(OpenAPI, {
             method: 'PATCH',
             url: '/api/designation/{id}',
+            path: {
+                'id': id,
+            },
             body: requestBody,
             mediaType: 'application/json',
         });
@@ -76,22 +116,20 @@ export class DesignationService {
      * @returns any
      * @throws ApiError
      */
-    public static designationControllerDeleteDesignationById(): CancelablePromise<DesignationSuccessDto> {
+    public static designationControllerRemove({
+        id,
+    }: {
+        /**
+         * The ID of the designation to delete
+         */
+        id: string,
+    }): CancelablePromise<DesignationSuccessDto> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/api/designation/{id}',
-        });
-    }
-    /**
-     * Batch get designations
-     * Retrieves multiple designations by their IDs.
-     * @returns any
-     * @throws ApiError
-     */
-    public static designationControllerFindDesignationsByIds(): CancelablePromise<DesignationListSuccessDto> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/designation/batch',
+            path: {
+                'id': id,
+            },
         });
     }
 }

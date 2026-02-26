@@ -19,7 +19,7 @@ export class DepartmentService {
      * @returns any
      * @throws ApiError
      */
-    public static departmentControllerCreateDepartment({
+    public static departmentControllerCreate({
         requestBody,
     }: {
         requestBody: CreateDepartmentDto,
@@ -37,10 +37,32 @@ export class DepartmentService {
      * @returns any
      * @throws ApiError
      */
-    public static departmentControllerFindDepartments(): CancelablePromise<DepartmentsListSuccessDto> {
+    public static departmentControllerFindAll({
+        pageNo,
+        pageSize,
+        searchKey = '',
+    }: {
+        /**
+         * The page number for pagination (1-based index)
+         */
+        pageNo: number,
+        /**
+         * The number of items per page (1-100)
+         */
+        pageSize: number,
+        /**
+         * Optional free-text search term to filter departments by name or description
+         */
+        searchKey?: string,
+    }): CancelablePromise<DepartmentsListSuccessDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/department',
+            query: {
+                'pageNo': pageNo,
+                'pageSize': pageSize,
+                'searchKey': searchKey,
+            },
         });
     }
     /**
@@ -49,10 +71,20 @@ export class DepartmentService {
      * @returns any
      * @throws ApiError
      */
-    public static departmentControllerFindDepartmentById(): CancelablePromise<DepartmentByIdSuccessDto> {
+    public static departmentControllerFindOne({
+        id,
+    }: {
+        /**
+         * The ID of the department to retrieve
+         */
+        id: string,
+    }): CancelablePromise<DepartmentByIdSuccessDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/department/{id}',
+            path: {
+                'id': id,
+            },
         });
     }
     /**
@@ -61,14 +93,22 @@ export class DepartmentService {
      * @returns any
      * @throws ApiError
      */
-    public static departmentControllerUpdateDepartmentById({
+    public static departmentControllerUpdate({
+        id,
         requestBody,
     }: {
+        /**
+         * The ID of the department to retrieve
+         */
+        id: string,
         requestBody: UpdateDepartmentDto,
     }): CancelablePromise<DepartmentPatchSuccessDto> {
         return __request(OpenAPI, {
             method: 'PATCH',
             url: '/api/department/{id}',
+            path: {
+                'id': id,
+            },
             body: requestBody,
             mediaType: 'application/json',
         });
@@ -79,10 +119,20 @@ export class DepartmentService {
      * @returns any
      * @throws ApiError
      */
-    public static departmentControllerDeleteDepartmentById(): CancelablePromise<DepartmentDeleteSuccessDto> {
+    public static departmentControllerRemove({
+        id,
+    }: {
+        /**
+         * The ID of the department to retrieve
+         */
+        id: string,
+    }): CancelablePromise<DepartmentDeleteSuccessDto> {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/api/department/{id}',
+            path: {
+                'id': id,
+            },
         });
     }
 }
