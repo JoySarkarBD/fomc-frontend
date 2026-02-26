@@ -9,7 +9,6 @@ import {
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { AttendanceModalTable } from "./AttendanceModalTable";
-import { TODAY_ATTENDANCE } from "@/constants/attendance";
 import { X } from "lucide-react";
 
 interface AttendanceModalProps {
@@ -55,55 +54,7 @@ export function AttendanceModal({ open, onClose }: AttendanceModalProps) {
             {/* Left: Date and Check-in Info */}
             <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-6">
               <div>
-                <h3 className="text-xs font-semibold text-foreground sm:text-sm">
-                  Today: {TODAY_ATTENDANCE.date} ({TODAY_ATTENDANCE.dayOfWeek})
-                </h3>
               </div>
-              {TODAY_ATTENDANCE.checkedInAt && (
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-foreground/70 sm:text-sm">
-                    Checked in at:
-                  </span>
-                  <span className="text-xs font-semibold text-foreground sm:text-sm">
-                    {TODAY_ATTENDANCE.checkedInAt}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            {/* Right: Action Buttons */}
-            <div className="flex items-center gap-2 sm:gap-3">
-              <Button
-                onClick={handleCheckIn}
-                disabled={!!TODAY_ATTENDANCE.checkedInAt}
-                className="flex flex-1 items-center justify-center gap-2 rounded-sm bg-[#14804A] px-4 py-2 text-xs font-medium text-white hover:bg-[#14804A]/90 disabled:opacity-50 sm:flex-none sm:px-6 sm:text-sm"
-              >
-                <Image
-                  src="/icons/tick-icons.png"
-                  alt="Check In"
-                  width={16}
-                  height={16}
-                  className="h-4 w-4"
-                />
-                Check In
-              </Button>
-              <Button
-                onClick={handleCheckOut}
-                disabled={
-                  !TODAY_ATTENDANCE.checkedInAt ||
-                  !!TODAY_ATTENDANCE.checkedOutAt
-                }
-                className="flex flex-1 items-center justify-center gap-2 rounded-sm bg-[#DC3545] px-4 py-2 text-xs font-medium text-white hover:bg-[#DC3545]/90 disabled:opacity-50 sm:flex-none sm:px-6 sm:text-sm"
-              >
-                <Image
-                  src="/icons/checkout-icons.png"
-                  alt="Check Out"
-                  width={16}
-                  height={16}
-                  className="h-4 w-4"
-                />
-                Check Out
-              </Button>
             </div>
           </div>
         </div>

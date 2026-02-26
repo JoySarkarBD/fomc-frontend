@@ -83,7 +83,7 @@ export class RoleService {
         id,
     }: {
         /**
-         * The ID of the department to retrieve
+         * The ID of the role to retrieve
          */
         id: string,
     }): CancelablePromise<RoleByIdSuccessDto> {
@@ -107,7 +107,7 @@ export class RoleService {
         requestBody,
     }: {
         /**
-         * The ID of the department to retrieve
+         * The ID of the role to update
          */
         id: string,
         /**
@@ -140,7 +140,7 @@ export class RoleService {
         authorization,
     }: {
         /**
-         * The ID of the department to retrieve
+         * The ID of the role to delete
          */
         id: string,
         /**

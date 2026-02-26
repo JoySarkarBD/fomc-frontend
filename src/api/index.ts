@@ -6,7 +6,9 @@ export { ApiError } from './core/ApiError';
 export { CancelablePromise, CancelError } from './core/CancelablePromise';
 export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
-import './config'
+import './config';
+
+export type { ApproveShiftExchangeSuccessDto } from './models/ApproveShiftExchangeSuccessDto';
 export { AttendanceByAuthorityDto } from './models/AttendanceByAuthorityDto';
 export type { ChangePasswordDto } from './models/ChangePasswordDto';
 export type { ChangePasswordInternalErrorDto } from './models/ChangePasswordInternalErrorDto';
@@ -78,6 +80,8 @@ export type { ForgotPasswordSuccessDto } from './models/ForgotPasswordSuccessDto
 export type { ForgotPasswordThrottlerDto } from './models/ForgotPasswordThrottlerDto';
 export type { ForgotPasswordValidationDto } from './models/ForgotPasswordValidationDto';
 export type { GetAttendanceDto } from './models/GetAttendanceDto';
+export type { GetMyShiftExchangesSuccessDto } from './models/GetMyShiftExchangesSuccessDto';
+export type { GetPendingShiftExchangesSuccessDto } from './models/GetPendingShiftExchangesSuccessDto';
 export type { GetSellsShiftDto } from './models/GetSellsShiftDto';
 export type { GetUserSellsShiftForbiddenDto } from './models/GetUserSellsShiftForbiddenDto';
 export type { GetUserSellsShiftInternalErrorDto } from './models/GetUserSellsShiftInternalErrorDto';
@@ -127,6 +131,8 @@ export type { RegistrationInternalErrorDto } from './models/RegistrationInternal
 export type { RegistrationRoleNotFoundDto } from './models/RegistrationRoleNotFoundDto';
 export type { RegistrationSuccessDto } from './models/RegistrationSuccessDto';
 export type { RegistrationValidationDto } from './models/RegistrationValidationDto';
+export type { RejectShiftExchangeSuccessDto } from './models/RejectShiftExchangeSuccessDto';
+export { RequestShiftExchangeDto } from './models/RequestShiftExchangeDto';
 export type { ResetPasswordDto } from './models/ResetPasswordDto';
 export type { ResetPasswordInternalErrorDto } from './models/ResetPasswordInternalErrorDto';
 export type { ResetPasswordSuccessDto } from './models/ResetPasswordSuccessDto';
@@ -159,6 +165,12 @@ export type { RoleUpdateInternalErrorDto } from './models/RoleUpdateInternalErro
 export type { RoleUpdateUnauthorizedDto } from './models/RoleUpdateUnauthorizedDto';
 export type { RoleUpdateValidationDto } from './models/RoleUpdateValidationDto';
 export type { SearchQueryDto } from './models/SearchQueryDto';
+export type { ShiftExchangeForbiddenDto } from './models/ShiftExchangeForbiddenDto';
+export type { ShiftExchangeInternalErrorDto } from './models/ShiftExchangeInternalErrorDto';
+export type { ShiftExchangeNotFoundDto } from './models/ShiftExchangeNotFoundDto';
+export type { ShiftExchangeRequestSuccessDto } from './models/ShiftExchangeRequestSuccessDto';
+export type { ShiftExchangeUnauthorizedDto } from './models/ShiftExchangeUnauthorizedDto';
+export type { ShiftExchangeValidationDto } from './models/ShiftExchangeValidationDto';
 export type { SingleUserAttendanceForbiddenDto } from './models/SingleUserAttendanceForbiddenDto';
 export type { SingleUserAttendanceInternalErrorDto } from './models/SingleUserAttendanceInternalErrorDto';
 export type { SingleUserAttendanceNotFoundDto } from './models/SingleUserAttendanceNotFoundDto';

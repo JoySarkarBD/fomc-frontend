@@ -34,6 +34,11 @@ const STATUS_STYLES: Record<
     text: "text-purple-700",
     label: "Exchange",
   },
+  "-": {
+    bg: "bg-gray-100",
+    text: "text-gray-700",
+    label: "-",
+  },
 };
 
 export function AttendanceTableRow({ record }: AttendanceTableRowProps) {
@@ -55,6 +60,9 @@ export function AttendanceTableRow({ record }: AttendanceTableRowProps) {
       </TableCell>
       <TableCell className="whitespace-nowrap py-3.5 text-sm text-foreground/70">
         {record.checkOut}
+      </TableCell>
+      <TableCell className="whitespace-nowrap py-3.5 text-sm text-foreground/70">
+        {record.shiftType}
       </TableCell>
       <TableCell className="whitespace-nowrap py-3.5">
         <span

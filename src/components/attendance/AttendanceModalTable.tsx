@@ -2,7 +2,6 @@
 
 import { ModalTable } from "@/components/shared/ModalTable";
 import { AttendanceModalRow } from "./AttendanceModalRow";
-import { DEMO_ATTENDANCE_RECORDS } from "@/constants/attendance";
 import type { AttendanceRecord } from "@/types/attendance";
 import type { ColumnDef } from "@/components/shared/ModalTable";
 
@@ -17,15 +16,6 @@ const COLUMNS: ColumnDef[] = [
 
 export function AttendanceModalTable() {
   return (
-    <ModalTable
-      data={DEMO_ATTENDANCE_RECORDS}
-      columns={COLUMNS}
-      totalRecords={DEMO_ATTENDANCE_RECORDS.length}
-      enableSearch={false}
-      enableCheckboxes={false}
-      renderRow={(record: AttendanceRecord) => (
-        <AttendanceModalRow key={record.rowNumber} record={record} />
-      )}
-    />
+    <div>hello</div>
   );
 }

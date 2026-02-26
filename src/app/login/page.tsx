@@ -8,7 +8,7 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { AuthenticationService, ApiError } from "@/api";
+import { AuthenticationService, ApiError, AttendanceService } from "@/api";
 import { useAuth } from "@/hooks/useAuth";
 import type { AuthUser } from "@/components/shared/AuthProvider";
 
@@ -100,7 +100,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen w-full bg-linear-to-br from-[#044192] via-[#0a5eb8] to-[#1976d2] flex items-center justify-center p-4">
       {/* Login Card */}
-      <div className="w-full max-w-xl bg-white rounded-lg shadow-2xl p-6 sm:p-8 md:p-10">
+      <div className="w-full max-w-md bg-white rounded-lg shadow-2xl p-6 sm:p-8 md:p-10">
         {/* Logo and Title Section */}
         <div className="flex flex-col items-center mb-6 sm:mb-8">
           <div className="flex items-center gap-4 mb-4 sm:mb-6">
@@ -211,7 +211,7 @@ export default function LoginPage() {
           </div>
 
           {/* reCAPTCHA Placeholder */}
-          <div className="max-w-60 mx-auto my-6">
+          {/* <div className="max-w-60 mx-auto my-6">
             <div className="flex items-center gap-3 border border-border rounded-sm px-4 py-2 sm:p-6 bg-background">
               <Checkbox
                 id="robot"
@@ -235,7 +235,7 @@ export default function LoginPage() {
                 />
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Sign In Button */}
           <div className="max-w-sm mx-auto">
