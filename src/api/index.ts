@@ -2,13 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import './config';
-
 export { ApiError } from './core/ApiError';
 export { CancelablePromise, CancelError } from './core/CancelablePromise';
 export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
-
+import './config'
 export { AttendanceByAuthorityDto } from './models/AttendanceByAuthorityDto';
 export type { ChangePasswordDto } from './models/ChangePasswordDto';
 export type { ChangePasswordInternalErrorDto } from './models/ChangePasswordInternalErrorDto';
@@ -19,7 +17,13 @@ export type { ChangePasswordValidationDto } from './models/ChangePasswordValidat
 export type { CreateDepartmentDto } from './models/CreateDepartmentDto';
 export type { CreateDesignationDto } from './models/CreateDesignationDto';
 export type { CreateRoleDto } from './models/CreateRoleDto';
+export type { CreateSellsShiftForbiddenDto } from './models/CreateSellsShiftForbiddenDto';
+export type { CreateSellsShiftInternalErrorDto } from './models/CreateSellsShiftInternalErrorDto';
 export { CreateSellsShiftManagementDto } from './models/CreateSellsShiftManagementDto';
+export type { CreateSellsShiftManagementSuccessDto } from './models/CreateSellsShiftManagementSuccessDto';
+export type { CreateSellsShiftNotFoundDto } from './models/CreateSellsShiftNotFoundDto';
+export type { CreateSellsShiftUnauthorizedDto } from './models/CreateSellsShiftUnauthorizedDto';
+export type { CreateSellsShiftValidationDto } from './models/CreateSellsShiftValidationDto';
 export type { CreateUserDto } from './models/CreateUserDto';
 export type { DepartmentByIdSuccessDto } from './models/DepartmentByIdSuccessDto';
 export type { DepartmentCreateConflictDto } from './models/DepartmentCreateConflictDto';
@@ -74,6 +78,13 @@ export type { ForgotPasswordSuccessDto } from './models/ForgotPasswordSuccessDto
 export type { ForgotPasswordThrottlerDto } from './models/ForgotPasswordThrottlerDto';
 export type { ForgotPasswordValidationDto } from './models/ForgotPasswordValidationDto';
 export type { GetAttendanceDto } from './models/GetAttendanceDto';
+export type { GetSellsShiftDto } from './models/GetSellsShiftDto';
+export type { GetUserSellsShiftForbiddenDto } from './models/GetUserSellsShiftForbiddenDto';
+export type { GetUserSellsShiftInternalErrorDto } from './models/GetUserSellsShiftInternalErrorDto';
+export type { GetUserSellsShiftNotFoundDto } from './models/GetUserSellsShiftNotFoundDto';
+export type { GetUserSellsShiftSuccessDto } from './models/GetUserSellsShiftSuccessDto';
+export type { GetUserSellsShiftUnauthorizedDto } from './models/GetUserSellsShiftUnauthorizedDto';
+export type { GetUserSellsShiftValidationDto } from './models/GetUserSellsShiftValidationDto';
 export type { LoginDto } from './models/LoginDto';
 export type { LoginInternalErrorDto } from './models/LoginInternalErrorDto';
 export type { LoginSuccessDto } from './models/LoginSuccessDto';

@@ -60,13 +60,21 @@ export class AuthenticationService {
      * @throws ApiError
      */
     public static authControllerForgot({
+        xDeviceId,
         requestBody,
     }: {
+        /**
+         * Unique identifier for the user's device, used for throttling password reset requests.
+         */
+        xDeviceId: string,
         requestBody: ForgotPasswordDto,
     }): CancelablePromise<ForgotPasswordSuccessDto> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/auth/forgot-password',
+            headers: {
+                'x-device-id': xDeviceId,
+            },
             body: requestBody,
             mediaType: 'application/json',
         });
@@ -78,13 +86,21 @@ export class AuthenticationService {
      * @throws ApiError
      */
     public static authControllerReset({
+        xDeviceId,
         requestBody,
     }: {
+        /**
+         * Unique identifier for the user's device, used for throttling password reset requests.
+         */
+        xDeviceId: string,
         requestBody: ResetPasswordDto,
     }): CancelablePromise<ResetPasswordSuccessDto> {
         return __request(OpenAPI, {
             method: 'PATCH',
             url: '/api/auth/reset-password',
+            headers: {
+                'x-device-id': xDeviceId,
+            },
             body: requestBody,
             mediaType: 'application/json',
         });
@@ -96,9 +112,14 @@ export class AuthenticationService {
      * @throws ApiError
      */
     public static authControllerChange({
+        xDeviceId,
         authorization,
         requestBody,
     }: {
+        /**
+         * Unique identifier for the user's device, used for throttling password change requests.
+         */
+        xDeviceId: string,
         /**
          * Bearer token
          */
@@ -109,6 +130,7 @@ export class AuthenticationService {
             method: 'PATCH',
             url: '/api/auth/change-password',
             headers: {
+                'x-device-id': xDeviceId,
                 'Authorization': authorization,
             },
             body: requestBody,
