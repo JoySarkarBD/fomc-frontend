@@ -7,6 +7,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { AuthenticationService } from "@/api";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -19,6 +20,13 @@ export default function LoginPage() {
     e.preventDefault();
     // Handle login logic here
     console.log({ email, password, rememberPassword, isNotRobot });
+
+   const result= AuthenticationService.authControllerLogin({
+      requestBody:{
+        email: email,
+        password: password
+      }
+    })
   };
 
   return (

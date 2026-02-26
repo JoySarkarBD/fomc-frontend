@@ -1,0 +1,88 @@
+/* generated using openapi-typescript-codegen -- do not edit */
+/* istanbul ignore file */
+/* tslint:disable */
+/* eslint-disable */
+import type { CreateDepartmentDto } from '../models/CreateDepartmentDto';
+import type { DepartmentByIdSuccessDto } from '../models/DepartmentByIdSuccessDto';
+import type { DepartmentCreateSuccessDto } from '../models/DepartmentCreateSuccessDto';
+import type { DepartmentDeleteSuccessDto } from '../models/DepartmentDeleteSuccessDto';
+import type { DepartmentPatchSuccessDto } from '../models/DepartmentPatchSuccessDto';
+import type { DepartmentsListSuccessDto } from '../models/DepartmentsListSuccessDto';
+import type { UpdateDepartmentDto } from '../models/UpdateDepartmentDto';
+import type { CancelablePromise } from '../core/CancelablePromise';
+import { OpenAPI } from '../core/OpenAPI';
+import { request as __request } from '../core/request';
+export class DepartmentService {
+    /**
+     * Create department
+     * Creates a new department in the organization.
+     * @returns any
+     * @throws ApiError
+     */
+    public static departmentControllerCreateDepartment({
+        requestBody,
+    }: {
+        requestBody: CreateDepartmentDto,
+    }): CancelablePromise<DepartmentCreateSuccessDto> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/department',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+    /**
+     * List departments
+     * Retrieves a list of departments with optional filtering.
+     * @returns any
+     * @throws ApiError
+     */
+    public static departmentControllerFindDepartments(): CancelablePromise<DepartmentsListSuccessDto> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/department',
+        });
+    }
+    /**
+     * Get department by ID
+     * Retrieves details of a specific department.
+     * @returns any
+     * @throws ApiError
+     */
+    public static departmentControllerFindDepartmentById(): CancelablePromise<DepartmentByIdSuccessDto> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/department/{id}',
+        });
+    }
+    /**
+     * Update department
+     * Updates an existing department's details.
+     * @returns any
+     * @throws ApiError
+     */
+    public static departmentControllerUpdateDepartmentById({
+        requestBody,
+    }: {
+        requestBody: UpdateDepartmentDto,
+    }): CancelablePromise<DepartmentPatchSuccessDto> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/api/department/{id}',
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+    /**
+     * Delete department
+     * Deletes a department by its ID.
+     * @returns any
+     * @throws ApiError
+     */
+    public static departmentControllerDeleteDepartmentById(): CancelablePromise<DepartmentDeleteSuccessDto> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/department/{id}',
+        });
+    }
+}
