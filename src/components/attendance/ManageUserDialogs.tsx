@@ -23,12 +23,25 @@ import {
 } from "@/components/ui/select";
 import { AttendanceService } from "@/api";
 import { AttendanceByAuthorityDto } from "@/api/models/AttendanceByAuthorityDto";
+import type { UpdateByAuthorityWeekendSetDto } from "@/api/models/UpdateByAuthorityWeekendSetDto";
 import {
   buildUTCIso,
   IN_TYPE_OPTIONS,
   nextTick,
   type UserOption,
 } from "./attendance-helpers";
+
+/* ── Weekend day options ─────────────────────────────────── */
+type WeekendDay = UpdateByAuthorityWeekendSetDto["weekEndOff"][number];
+const WEEKEND_DAY_OPTIONS: { value: WeekendDay; label: string }[] = [
+  { value: "SUNDAY", label: "Sunday" },
+  { value: "MONDAY", label: "Monday" },
+  { value: "TUESDAY", label: "Tuesday" },
+  { value: "WEDNESDAY", label: "Wednesday" },
+  { value: "THURSDAY", label: "Thursday" },
+  { value: "FRIDAY", label: "Friday" },
+  { value: "SATURDAY", label: "Saturday" },
+];
 
 interface ManageUserDialogsProps {
   authorization: string | null;
@@ -47,6 +60,11 @@ export function ManageUserDialogs({
   // Manage Attendance dialog
   const [attendanceOpen, setAttendanceOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  // Update Weekend dialog
+  const [weekendOpen, setWeekendOpen] = useState(false);
+  const [weekendSubmitting, setWeekendSubmitting] = useState(false);
+  const [weekendDay, setWeekendDay] = useState<WeekendDay | "">("")
 
   // Form state
   const [maDate, setMaDate] = useState("");
@@ -69,8 +87,69 @@ export function ManageUserDialogs({
     setMaAmpm("AM");
   };
 
+  const resetWeekendForm = () => {
+    setWeekendDay("");
+  };
+
   /* ── Open manage menu ──────────────────────────────────── */
   const openMenu = () => setMenuOpen(true);
+
+  /* ── Submit update weekend ─────────────────────────────── */
+  const handleWeekendSubmit = async () => {
+    if (!authorization || !selectedUser || !weekendDay) return;
+    setWeekendSubmitting(true);
+    try {
+      const res = await AttendanceService.attendanceControllerUpdateWeekendOff({
+        userId: selectedUser._id,
+        authorization,
+        requestBody: { weekEndOff: [weekendDay] },
+      });
+      const msg = (res as any)?.message ?? "Weekend updated successfully.";
+      setWeekendOpen(false);
+      resetWeekendForm();
+      await nextTick();
+      Swal.fire({
+        icon: "success",
+        title: "Weekend Updated!",
+        text: msg,
+        timer: 2500,
+        showConfirmButton: false,
+      });
+    } catch (err: any) {
+      setWeekendOpen(false);
+      resetWeekendForm();
+      await nextTick();
+
+      const status = err?.status ?? err?.response?.status;
+      let title = "Failed";
+      let msg = err?.body?.message ?? "Something went wrong.";
+      if (status === 400) {
+        title = "Validation Error";
+        const errors = err?.body?.errors;
+        if (Array.isArray(errors)) {
+          msg = errors.map((e: any) => e.message).join(", ");
+        }
+      } else if (status === 401) {
+        title = "Unauthorized";
+        msg = "Session expired. Please log in again.";
+      } else if (status === 403) {
+        title = "Forbidden";
+        msg =
+          err?.body?.message ?? "You don't have permission for this action.";
+      } else if (status === 404) {
+        title = "Not Found";
+        msg = err?.body?.message ?? "User not found.";
+      }
+      Swal.fire({
+        icon: "error",
+        title,
+        text: msg,
+        confirmButtonColor: "#DC3545",
+      });
+    } finally {
+      setWeekendSubmitting(false);
+    }
+  };
 
   /* ── Submit manage attendance ──────────────────────────── */
   const handleSubmit = async () => {
@@ -164,7 +243,11 @@ export function ManageUserDialogs({
             <Button
               variant="outline"
               className="w-full justify-start gap-2"
-              disabled
+              onClick={() => {
+                setMenuOpen(false);
+                resetWeekendForm();
+                setWeekendOpen(true);
+              }}
             >
               <CalendarDays className="h-4 w-4" />
               Update Weekend
@@ -190,6 +273,66 @@ export function ManageUserDialogs({
               Exchange Weekend
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Update Weekend Dialog ────────────────────────── */}
+      <Dialog
+        open={weekendOpen}
+        onOpenChange={(open) => {
+          setWeekendOpen(open);
+          if (!open) resetWeekendForm();
+        }}
+      >
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Update Weekend</DialogTitle>
+            <DialogDescription>
+              Set weekend day for {selectedUser?.employeeId} —{" "}
+              {selectedUser?.name}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-4 py-2">
+            <div className="flex flex-col gap-1.5">
+              <Label>Weekend Day</Label>
+              <Select
+                value={weekendDay}
+                onValueChange={(val) => setWeekendDay(val as WeekendDay)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a day" />
+                </SelectTrigger>
+                <SelectContent>
+                  {WEEKEND_DAY_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setWeekendOpen(false);
+                resetWeekendForm();
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleWeekendSubmit}
+              disabled={!weekendDay || weekendSubmitting}
+              className="gap-2"
+            >
+              {weekendSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+              Submit
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
