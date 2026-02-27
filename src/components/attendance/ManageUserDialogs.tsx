@@ -27,6 +27,7 @@ import type { UpdateByAuthorityWeekendSetDto } from "@/api/models/UpdateByAuthor
 import {
   buildUTCIso,
   IN_TYPE_OPTIONS,
+  mapInTypeToStatus,
   nextTick,
   type UserOption,
 } from "./attendance-helpers";
@@ -66,6 +67,12 @@ export function ManageUserDialogs({
   const [weekendSubmitting, setWeekendSubmitting] = useState(false);
   const [weekendDay, setWeekendDay] = useState<WeekendDay | "">("")
 
+  // Exchange Weekend dialog
+  const [exchangeOpen, setExchangeOpen] = useState(false);
+  const [exchangeSubmitting, setExchangeSubmitting] = useState(false);
+  const [exchangeOriginalDate, setExchangeOriginalDate] = useState("");
+  const [exchangeNewDate, setExchangeNewDate] = useState("");
+
   // Form state
   const [maDate, setMaDate] = useState("");
   const [maInType, setMaInType] = useState<
@@ -77,7 +84,8 @@ export function ManageUserDialogs({
 
   const maShowTime =
     maInType === AttendanceByAuthorityDto.inType.PRESENT ||
-    maInType === AttendanceByAuthorityDto.inType.LATE;
+    maInType === AttendanceByAuthorityDto.inType.LATE ||
+    maInType === AttendanceByAuthorityDto.inType.WORK_FROM_HOME;
 
   const resetForm = () => {
     setMaDate("");
@@ -89,6 +97,11 @@ export function ManageUserDialogs({
 
   const resetWeekendForm = () => {
     setWeekendDay("");
+  };
+
+  const resetExchangeForm = () => {
+    setExchangeOriginalDate("");
+    setExchangeNewDate("");
   };
 
   /* ── Open manage menu ──────────────────────────────────── */
@@ -148,6 +161,67 @@ export function ManageUserDialogs({
       });
     } finally {
       setWeekendSubmitting(false);
+    }
+  };
+
+  /* ── Submit exchange weekend ───────────────────────────── */
+  const handleExchangeSubmit = async () => {
+    if (!authorization || !selectedUser || !exchangeOriginalDate || !exchangeNewDate) return;
+    setExchangeSubmitting(true);
+    try {
+      const res = await AttendanceService.attendanceControllerWeekendExchangeByAuthority({
+        userId: selectedUser._id,
+        authorization,
+        requestBody: {
+          originalWeekendDate: `${exchangeOriginalDate}T00:00:00.000Z`,
+          newOffDate: `${exchangeNewDate}T00:00:00.000Z`,
+        },
+      });
+      const msg = (res as any)?.message ?? "Weekend exchanged successfully.";
+      setExchangeOpen(false);
+      resetExchangeForm();
+      await onAttendanceMarked();
+      await nextTick();
+      Swal.fire({
+        icon: "success",
+        title: "Weekend Exchanged!",
+        text: msg,
+        timer: 2500,
+        showConfirmButton: false,
+      });
+    } catch (err: any) {
+      setExchangeOpen(false);
+      resetExchangeForm();
+      await nextTick();
+
+      const status = err?.status ?? err?.response?.status;
+      let title = "Failed";
+      let msg = err?.body?.message ?? "Something went wrong.";
+      if (status === 400) {
+        title = "Validation Error";
+        const errors = err?.body?.errors;
+        if (Array.isArray(errors)) {
+          msg = errors.map((e: any) => e.message).join(", ");
+        }
+      } else if (status === 401) {
+        title = "Unauthorized";
+        msg = "Session expired. Please log in again.";
+      } else if (status === 403) {
+        title = "Forbidden";
+        msg =
+          err?.body?.message ?? "You don't have permission for this action.";
+      } else if (status === 404) {
+        title = "Not Found";
+        msg = err?.body?.message ?? "User not found.";
+      }
+      Swal.fire({
+        icon: "error",
+        title,
+        text: msg,
+        confirmButtonColor: "#DC3545",
+      });
+    } finally {
+      setExchangeSubmitting(false);
     }
   };
 
@@ -267,7 +341,11 @@ export function ManageUserDialogs({
             <Button
               variant="outline"
               className="w-full justify-start gap-2"
-              disabled
+              onClick={() => {
+                setMenuOpen(false);
+                resetExchangeForm();
+                setExchangeOpen(true);
+              }}
             >
               <CalendarDays className="h-4 w-4" />
               Exchange Weekend
@@ -461,6 +539,69 @@ export function ManageUserDialogs({
               className="gap-2"
             >
               {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
+              Submit
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── Exchange Weekend Dialog ──────────────────────── */}
+      <Dialog
+        open={exchangeOpen}
+        onOpenChange={(open) => {
+          setExchangeOpen(open);
+          if (!open) resetExchangeForm();
+        }}
+      >
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Exchange Weekend</DialogTitle>
+            <DialogDescription>
+              Swap a weekend day for {selectedUser?.employeeId} —{" "}
+              {selectedUser?.name}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-4 py-2">
+            {/* Original Weekend Date */}
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="ex-original-date">Original Weekend Date</Label>
+              <Input
+                id="ex-original-date"
+                type="date"
+                value={exchangeOriginalDate}
+                onChange={(e) => setExchangeOriginalDate(e.target.value)}
+              />
+            </div>
+
+            {/* New Off Date */}
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="ex-new-date">New Off Date</Label>
+              <Input
+                id="ex-new-date"
+                type="date"
+                value={exchangeNewDate}
+                onChange={(e) => setExchangeNewDate(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setExchangeOpen(false);
+                resetExchangeForm();
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleExchangeSubmit}
+              disabled={!exchangeOriginalDate || !exchangeNewDate || exchangeSubmitting}
+              className="gap-2"
+            >
+              {exchangeSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
               Submit
             </Button>
           </DialogFooter>
