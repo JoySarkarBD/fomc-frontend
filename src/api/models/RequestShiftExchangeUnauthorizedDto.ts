@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type ShiftExchangeInternalErrorDto = {
+export type RequestShiftExchangeUnauthorizedDto = {
     success: boolean;
     message: string;
     method: Record<string, any>;

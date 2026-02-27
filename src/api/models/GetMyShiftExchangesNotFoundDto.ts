@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type ShiftExchangeUnauthorizedDto = {
+export type GetMyShiftExchangesNotFoundDto = {
     success: boolean;
     message: string;
     method: Record<string, any>;

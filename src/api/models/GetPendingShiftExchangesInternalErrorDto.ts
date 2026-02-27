@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type ShiftExchangeNotFoundDto = {
+export type GetPendingShiftExchangesInternalErrorDto = {
     success: boolean;
     message: string;
     method: Record<string, any>;

@@ -6,10 +6,7 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
-import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { AttendanceModalTable } from "./AttendanceModalTable";
-import { X } from "lucide-react";
+import { AttendanceContent } from "./AttendanceContent";
 
 interface AttendanceModalProps {
   open: boolean;
@@ -17,19 +14,9 @@ interface AttendanceModalProps {
 }
 
 export function AttendanceModal({ open, onClose }: AttendanceModalProps) {
-  const handleCheckIn = () => {
-    // TODO: Implement check-in functionality
-    console.log("Check In clicked");
-  };
-
-  const handleCheckOut = () => {
-    // TODO: Implement check-out functionality
-    console.log("Check Out clicked");
-  };
-
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="flex max-h-[85vh] w-[calc(100vw-2rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-4xl">
+      <DialogContent className="flex max-h-[90vh] w-[calc(100vw-2rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-6xl">
         <DialogTitle className="sr-only">My Attendance</DialogTitle>
         <DialogDescription className="sr-only">
           View and manage your attendance records
@@ -44,24 +31,13 @@ export function AttendanceModal({ open, onClose }: AttendanceModalProps) {
             onClick={onClose}
             className="rounded-sm p-1.5 hover:bg-muted transition-colors"
           >
-            {/* <X className="h-5 w-5" /> */}
+            {/* close handled by Dialog overlay click / Esc */}
           </button>
         </div>
 
-        {/* Today's Attendance Info Section */}
-        <div className="px-4 py-3 sm:px-6 sm:py-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            {/* Left: Date and Check-in Info */}
-            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-6">
-              <div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Table Content */}
-        <div className="flex-1 overflow-y-auto px-4 pb-4 pt-2 sm:px-6 sm:pb-6 sm:pt-4">
-          <AttendanceModalTable />
+        {/* Attendance Content */}
+        <div className="flex-1 overflow-y-auto px-4 pb-4 sm:px-6 sm:pb-6">
+          <AttendanceContent />
         </div>
       </DialogContent>
     </Dialog>

@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { AttendanceTablePagination } from "./AttendanceTablePagination";
+// import { AttendanceTablePagination } from "./AttendanceTablePagination";
 
 export interface FilterTab<T = string> {
   label: string;
@@ -182,7 +182,7 @@ export function AttendanceTable<TData, TFilter = string>({
       </div>
 
       {/* Pagination */}
-      <AttendanceTablePagination
+      {/* <AttendanceTablePagination
         currentPage={currentPage}
         totalPages={totalPages}
         rowsPerPage={rowsPerPage}
@@ -192,7 +192,7 @@ export function AttendanceTable<TData, TFilter = string>({
         rowsPerPageOptions={rowsPerPageOptions}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleRowsPerPageChange}
-      />
+      /> */}
     </div>
   );
 }

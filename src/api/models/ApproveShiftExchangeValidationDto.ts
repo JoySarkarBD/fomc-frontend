@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { FieldErrorDto } from './FieldErrorDto';
-export type GetUserSellsShiftValidationDto = {
+export type ApproveShiftExchangeValidationDto = {
     success: boolean;
     message: string;
     method: Record<string, any>;

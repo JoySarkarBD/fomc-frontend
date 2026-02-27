@@ -2,14 +2,13 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { FieldErrorDto } from './FieldErrorDto';
-export type GetUserSellsShiftValidationDto = {
+export type ApproveShiftExchangeUnauthorizedDto = {
     success: boolean;
     message: string;
     method: Record<string, any>;
     endpoint: string;
     statusCode: number;
     timestamp: string;
-    errors: Array<FieldErrorDto>;
+    error: string;
 };
 

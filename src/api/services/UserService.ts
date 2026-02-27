@@ -26,7 +26,6 @@ export class UserService {
         role,
         department,
         designation,
-        search,
     }: {
         /**
          * Page number, starts from 1
@@ -41,7 +40,7 @@ export class UserService {
          */
         authorization: string,
         /**
-         * Optional free-text search term; can be null or empty
+         * Search keyword
          */
         searchKey?: string,
         /**
@@ -56,10 +55,6 @@ export class UserService {
          * Filter users by designation IDs (comma-separated or array)
          */
         designation?: Object,
-        /**
-         * Search keyword
-         */
-        search?: string,
     }): CancelablePromise<UsersListSuccessDto> {
         return __request(OpenAPI, {
             method: 'GET',
@@ -74,7 +69,6 @@ export class UserService {
                 'role': role,
                 'department': department,
                 'designation': designation,
-                'search': search,
             },
         });
     }
