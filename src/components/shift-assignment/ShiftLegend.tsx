@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { RequestShiftChangeModal } from "./RequestShiftChangeModal";
+import { AssignShiftModal } from "./AssignShiftModal";
 
 interface ShiftLegendProps {
   onShiftChangeSubmit: () => void;
@@ -39,6 +40,7 @@ const SHIFT_TYPES: ShiftType[] = [
 
 export function ShiftLegend({ onShiftChangeSubmit }: ShiftLegendProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
 
   return (
     <div className="mb-2 flex flex-col gap-3 rounded-sm bg-[#eef0f3] p-3 sm:flex-row sm:items-center sm:justify-between">
@@ -59,19 +61,33 @@ export function ShiftLegend({ onShiftChangeSubmit }: ShiftLegendProps) {
         ))}
       </div>
 
-      {/* Request Shift Change Button */}
-      <Button
-        onClick={() => setIsModalOpen(true)}
-        className="w-50 rounded-sm bg-[#14804A] px-5 py-2 text-sm font-medium text-white hover:bg-[#14804A]/90 sm:w-auto"
-      >
-        Request Shift Change
-      </Button>
+      {/* Action Buttons */}
+      <div className="flex flex-row flex-wrap gap-2 sm:items-center">
+        <Button
+          onClick={() => setIsAssignModalOpen(true)}
+          className="rounded-sm bg-[#044192] px-5 py-2 text-sm font-medium text-white hover:bg-[#044192]/90"
+        >
+          Assign Shift
+        </Button>
+        <Button
+          onClick={() => setIsModalOpen(true)}
+          className="rounded-sm bg-[#14804A] px-5 py-2 text-sm font-medium text-white hover:bg-[#14804A]/90"
+        >
+          Request Shift Change
+        </Button>
+      </div>
 
       {/* Request Shift Change Modal */}
       <RequestShiftChangeModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={onShiftChangeSubmit}
+      />
+
+      {/* Assign Shift Modal */}
+      <AssignShiftModal
+        open={isAssignModalOpen}
+        onClose={() => setIsAssignModalOpen(false)}
       />
     </div>
   );

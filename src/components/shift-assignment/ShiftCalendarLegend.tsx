@@ -16,7 +16,7 @@ export function ShiftCalendarLegend() {
               alt={style.label}
               width={16}
               height={16}
-              className="sm:w-[18px] sm:h-[18px]"
+              className="sm:w-4.5 sm:h-4.5"
             />
             <span className="text-xs font-medium text-foreground/70 sm:text-sm">
               <span className="sm:hidden">{style.label.split(" ")[0]}</span>
