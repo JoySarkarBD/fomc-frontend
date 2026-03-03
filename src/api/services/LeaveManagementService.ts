@@ -7,6 +7,7 @@ import type { LeaveRequestDto } from '../models/LeaveRequestDto';
 import type { LeaveRequestRejectionSuccessDto } from '../models/LeaveRequestRejectionSuccessDto';
 import type { LeaveRequestSuccessDto } from '../models/LeaveRequestSuccessDto';
 import type { MyLeavesSuccessDto } from '../models/MyLeavesSuccessDto';
+import type { PendingLeaveRequestsForAuthoritySuccessDto } from '../models/PendingLeaveRequestsForAuthoritySuccessDto';
 import type { SpecificLeaveRequestSuccessDto } from '../models/SpecificLeaveRequestSuccessDto';
 import type { UserSpecificLeaveSuccessDto } from '../models/UserSpecificLeaveSuccessDto';
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -68,18 +69,44 @@ export class LeaveManagementService {
         });
     }
     /**
+     * Retrieve all pending leave requests for authority
+     * @returns any
+     * @throws ApiError
+     */
+    public static leaveControllerGetAllPendingLeaveRequestsForAuthority({
+        authorization,
+    }: {
+        /**
+         * Bearer token
+         */
+        authorization: string,
+    }): CancelablePromise<PendingLeaveRequestsForAuthoritySuccessDto> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/leave/pending-approvals',
+            headers: {
+                'Authorization': authorization,
+            },
+        });
+    }
+    /**
      * Retrieve a specific leave request by ID
      * @returns any
      * @throws ApiError
      */
     public static leaveControllerGetUserSpecificLeaves({
         year,
+        userId,
         authorization,
     }: {
         /**
          * The year for which to retrieve leave records
          */
         year: number,
+        /**
+         * The ID of the user to retrieve leave records for
+         */
+        userId: string,
         /**
          * Bearer token
          */
@@ -88,6 +115,9 @@ export class LeaveManagementService {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/leave/user-specific/{userId}',
+            path: {
+                'userId': userId,
+            },
             headers: {
                 'Authorization': authorization,
             },
@@ -103,15 +133,23 @@ export class LeaveManagementService {
      */
     public static leaveControllerGetLeaveById({
         authorization,
+        id,
     }: {
         /**
          * Bearer token
          */
         authorization: string,
+        /**
+         * The ID of the leave request to retrieve
+         */
+        id: string,
     }): CancelablePromise<SpecificLeaveRequestSuccessDto> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/leave/{id}',
+            path: {
+                'id': id,
+            },
             headers: {
                 'Authorization': authorization,
             },
@@ -123,8 +161,13 @@ export class LeaveManagementService {
      * @throws ApiError
      */
     public static leaveControllerApproveLeaveRequest({
+        id,
         authorization,
     }: {
+        /**
+         * The ID of the leave request to approve
+         */
+        id: string,
         /**
          * Bearer token
          */
@@ -133,6 +176,9 @@ export class LeaveManagementService {
         return __request(OpenAPI, {
             method: 'PATCH',
             url: '/api/leave/approve/{id}',
+            path: {
+                'id': id,
+            },
             headers: {
                 'Authorization': authorization,
             },
@@ -144,8 +190,13 @@ export class LeaveManagementService {
      * @throws ApiError
      */
     public static leaveControllerRejectLeaveRequest({
+        id,
         authorization,
     }: {
+        /**
+         * The ID of the leave request to reject
+         */
+        id: string,
         /**
          * Bearer token
          */
@@ -154,6 +205,9 @@ export class LeaveManagementService {
         return __request(OpenAPI, {
             method: 'PATCH',
             url: '/api/leave/reject/{id}',
+            path: {
+                'id': id,
+            },
             headers: {
                 'Authorization': authorization,
             },

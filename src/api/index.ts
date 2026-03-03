@@ -241,3 +241,4 @@ export { DesignationManagementService } from './services/DesignationManagementSe
 export { RoleManagementService } from './services/RoleManagementService';
 export { SellsShiftManagementService } from './services/SellsShiftManagementService';
 export { UserManagementService } from './services/UserManagementService';
+export { LeaveManagementService } from './services/LeaveManagementService';

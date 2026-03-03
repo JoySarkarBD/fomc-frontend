@@ -29,6 +29,8 @@ interface ShiftUserSelectorProps {
   myUserId: string | null;
   selectedUser: ShiftUserOption | null;
   onSelectUser: (user: ShiftUserOption | null) => void;
+  /** Label shown when no user is selected (defaults to "My Shifts") */
+  selfLabel?: string;
 }
 
 export function ShiftUserSelector({
@@ -36,6 +38,7 @@ export function ShiftUserSelector({
   myUserId,
   selectedUser,
   onSelectUser,
+  selfLabel = "My Shifts",
 }: ShiftUserSelectorProps) {
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [searchKey, setSearchKey] = useState("");
@@ -105,7 +108,7 @@ export function ShiftUserSelector({
           >
             {selectedUser
               ? `${selectedUser.employeeId} — ${selectedUser.name}`
-              : "My Shifts"}
+              : selfLabel}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
@@ -142,7 +145,7 @@ export function ShiftUserSelector({
                           selectedUser === null ? "opacity-100" : "opacity-0"
                         }`}
                       />
-                      My Shifts
+                      {selfLabel}
                     </CommandItem>
                     {/* User list */}
                     {userList
@@ -184,7 +187,7 @@ export function ShiftUserSelector({
           size="icon"
           className="h-8 w-8"
           onClick={() => onSelectUser(null)}
-          title="Back to my shifts"
+          title="Back to my data"
         >
           <X className="h-4 w-4" />
         </Button>

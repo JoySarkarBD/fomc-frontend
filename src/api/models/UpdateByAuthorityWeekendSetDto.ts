@@ -4,7 +4,7 @@
 /* eslint-disable */
 export type UpdateByAuthorityWeekendSetDto = {
     /**
-     * The weekend off value(s) to be set for the user
+     * The weekend off value(s) to be set for the user - SUNDAY, SATURDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY
      */
     weekEndOff: Array<'SUNDAY' | 'SATURDAY' | 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY'>;
 };

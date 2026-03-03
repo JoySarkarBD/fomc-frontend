@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { ArrowUpDown } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { ArrowUpDown, Loader2 } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -9,20 +9,92 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { LeaveTableRow } from "./LeaveTableRow";
 import { LeavePagination } from "./LeavePagination";
 import {
-  DEMO_LEAVE_RECORDS,
   LEAVE_ROWS_PER_PAGE_OPTIONS,
   LEAVE_TABLE_COLUMNS,
-  LEAVE_TOTAL_RECORDS,
 } from "@/constants/leave";
+import { useAccessToken } from "@/hooks/useAccessToken";
+import { LeaveManagementService } from "@/api";
+import type { ILeaveRecord } from "@/types/ILeave";
+import {
+  ShiftUserSelector,
+  type ShiftUserOption,
+} from "@/components/shift-assignment/ShiftUserSelector";
 
-export function LeaveTable() {
+const YEARS = Array.from({ length: 16 }, (_, i) => new Date().getFullYear() - 1 + i);
+
+interface LeaveTableProps {
+  refreshKey?: number;
+  isPrivileged?: boolean;
+  authorization?: string | null;
+  myUserId?: string | null;
+  selectedUser?: ShiftUserOption | null;
+  onSelectUser?: (user: ShiftUserOption | null) => void;
+}
+
+export function LeaveTable({
+  refreshKey,
+  isPrivileged,
+  authorization,
+  myUserId,
+  selectedUser,
+  onSelectUser,
+}: LeaveTableProps) {
+  const token = useAccessToken();
+  const [records, setRecords] = useState<ILeaveRecord[]>([]);
+  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [year, setYear] = useState(new Date().getFullYear());
 
-  const totalPages = Math.ceil(LEAVE_TOTAL_RECORDS / rowsPerPage);
+  const isViewingOtherUser = isPrivileged && selectedUser !== null;
+
+  const fetchLeaves = useCallback(async () => {
+    if (!token) return;
+    setLoading(true);
+    try {
+      let res: any;
+      if (isViewingOtherUser && selectedUser) {
+        res = await LeaveManagementService.leaveControllerGetUserSpecificLeaves({
+          year,
+          userId: selectedUser._id,
+          authorization: token,
+        });
+      } else {
+        res = await LeaveManagementService.leaveControllerGetMyLeaves({
+          year,
+          authorization: token,
+        });
+      }
+      const data = (res as any)?.data;
+      setRecords(Array.isArray(data) ? data : []);
+    } catch {
+      setRecords([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [token, year, refreshKey, isViewingOtherUser, selectedUser]);
+
+  useEffect(() => {
+    fetchLeaves();
+  }, [fetchLeaves]);
+
+  const totalRecords = records.length;
+  const totalPages = Math.max(1, Math.ceil(totalRecords / rowsPerPage));
+
+  const paginatedRecords = useMemo(() => {
+    const start = (currentPage - 1) * rowsPerPage;
+    return records.slice(start, start + rowsPerPage);
+  }, [records, currentPage, rowsPerPage]);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
@@ -35,8 +107,45 @@ export function LeaveTable() {
 
   return (
     <div className="overflow-hidden rounded-sm">
+      {/* User Selector + Year Selector */}
+      <div className="mb-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          {isPrivileged && onSelectUser ? (
+            <ShiftUserSelector
+              authorization={authorization ?? null}
+              myUserId={myUserId ?? null}
+              selectedUser={selectedUser ?? null}
+              onSelectUser={onSelectUser}
+              selfLabel="My Leaves"
+            />
+          ) : null}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium text-foreground/70">Year:</label>
+          <Select
+            value={year.toString()}
+            onValueChange={(v) => {
+              setYear(Number(v));
+              setCurrentPage(1);
+            }}
+          >
+            <SelectTrigger className="h-9 w-24 rounded-sm border-border/60 text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {YEARS.map((y) => (
+                <SelectItem key={y} value={y.toString()}>
+                  {y}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
       {/* Table */}
-      <div className="overflow-x-auto rounded-t-sm border border-b-0">
+      <div className="overflow-x-auto rounded-t-sm border">
         <Table>
           <TableHeader>
             <TableRow className="border-b-0 bg-[#E7EFFF]">
@@ -56,22 +165,36 @@ export function LeaveTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {DEMO_LEAVE_RECORDS.map((record) => (
-              <LeaveTableRow key={record.id} record={record} />
-            ))}
+            {loading ? (
+              <TableRow>
+                <td
+                  colSpan={LEAVE_TABLE_COLUMNS.length}
+                  className="py-12 text-center"
+                >
+                  <Loader2 className="mx-auto h-6 w-6 animate-spin text-[#044192]" />
+                </td>
+              </TableRow>
+            ) : paginatedRecords.length === 0 ? (
+              <TableRow>
+                <td
+                  colSpan={LEAVE_TABLE_COLUMNS.length}
+                  className="py-12 text-center text-sm text-muted-foreground"
+                >
+                  No leave records found.
+                </td>
+              </TableRow>
+            ) : (
+              paginatedRecords.map((record, idx) => (
+                <LeaveTableRow
+                  key={record._id}
+                  record={record}
+                  rowNumber={(currentPage - 1) * rowsPerPage + idx + 1}
+                />
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
-
-      <LeavePagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        rowsPerPage={rowsPerPage}
-        totalRecords={LEAVE_TOTAL_RECORDS}
-        rowsPerPageOptions={LEAVE_ROWS_PER_PAGE_OPTIONS}
-        onPageChange={handlePageChange}
-        onRowsPerPageChange={handleRowsPerPageChange}
-      />
     </div>
   );
 }

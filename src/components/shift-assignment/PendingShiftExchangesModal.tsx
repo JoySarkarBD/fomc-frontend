@@ -92,7 +92,7 @@ export function PendingShiftExchangesModal({
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState<{ id: string; action: "approve" | "reject" } | null>(null);
 
   /* ── fetch pending exchanges ── */
   const fetchPending = useCallback(async () => {
@@ -160,8 +160,8 @@ export function PendingShiftExchangesModal({
 
   /* ── approve / reject ── */
   const handleApprove = async (exchangeId: string) => {
-    if (!token) return;
-    setActionLoadingId(exchangeId);
+    if (!token || actionLoading) return;
+    setActionLoading({ id: exchangeId, action: "approve" });
     try {
       await SellsShiftManagementService.sellsShiftManagementControllerApproveShiftExchange(
         { exchangeId, authorization: token }
@@ -173,13 +173,13 @@ export function PendingShiftExchangesModal({
         err?.body?.message ?? err?.message ?? "Failed to approve request.";
       toast.error(Array.isArray(msg) ? msg.join(", ") : msg);
     } finally {
-      setActionLoadingId(null);
+      setActionLoading(null);
     }
   };
 
   const handleReject = async (exchangeId: string) => {
-    if (!token) return;
-    setActionLoadingId(exchangeId);
+    if (!token || actionLoading) return;
+    setActionLoading({ id: exchangeId, action: "reject" });
     try {
       await SellsShiftManagementService.sellsShiftManagementControllerRejectShiftExchange(
         { exchangeId, authorization: token }
@@ -191,7 +191,7 @@ export function PendingShiftExchangesModal({
         err?.body?.message ?? err?.message ?? "Failed to reject request.";
       toast.error(Array.isArray(msg) ? msg.join(", ") : msg);
     } finally {
-      setActionLoadingId(null);
+      setActionLoading(null);
     }
   };
 
@@ -295,7 +295,13 @@ export function PendingShiftExchangesModal({
                       paginated.map((ex, idx) => {
                         const name = getName(ex);
                         const empId = getEmployeeId(ex);
-                        const isLoading = actionLoadingId === ex._id;
+                        const isApprovingThis =
+                          actionLoading?.id === ex._id &&
+                          actionLoading?.action === "approve";
+                        const isRejectingThis =
+                          actionLoading?.id === ex._id &&
+                          actionLoading?.action === "reject";
+                        const isAnyAction = actionLoading !== null;
 
                         return (
                           <TableRow
@@ -352,11 +358,11 @@ export function PendingShiftExchangesModal({
                               <div className="flex items-center justify-center gap-2">
                                 <Button
                                   size="sm"
-                                  disabled={isLoading}
+                                  disabled={isAnyAction}
                                   onClick={() => handleApprove(ex._id)}
                                   className="rounded-sm bg-[#14804A] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#14804A]/90 sm:px-4"
                                 >
-                                  {isLoading ? (
+                                  {isApprovingThis ? (
                                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
                                   ) : (
                                     <>
@@ -367,11 +373,11 @@ export function PendingShiftExchangesModal({
                                 </Button>
                                 <Button
                                   size="sm"
-                                  disabled={isLoading}
+                                  disabled={isAnyAction}
                                   onClick={() => handleReject(ex._id)}
                                   className="rounded-sm bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-600/90 sm:px-4"
                                 >
-                                  {isLoading ? (
+                                  {isRejectingThis ? (
                                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
                                   ) : (
                                     <>

@@ -68,14 +68,14 @@ export function AttendanceContent() {
       let res: any;
       if (isViewingOtherUser && selectedUser) {
         res =
-          await AttendanceService.attendanceControllerGetSpecificUserAttendance({
+          await AttendanceManagementService.attendanceControllerGetSpecificUserAttendance({
             month,
             year,
             userId: selectedUser._id,
             authorization,
           });
       } else {
-        res = await AttendanceService.attendanceControllerGetMyAttendance({
+        res = await AttendanceManagementService.attendanceControllerGetMyAttendance({
           month,
           year,
           authorization,
@@ -118,7 +118,7 @@ export function AttendanceContent() {
     if (!authorization || actionLoading) return;
     setActionLoading("checkin");
     try {
-      await AttendanceService.attendanceControllerPresentAttendance({
+      await AttendanceManagementService.attendanceControllerPresentAttendance({
         authorization,
       });
       await fetchAttendance();
@@ -141,7 +141,7 @@ export function AttendanceContent() {
     if (!authorization || actionLoading) return;
     setActionLoading("checkout");
     try {
-      await AttendanceService.attendanceControllerOutAttendance({
+      await AttendanceManagementService.attendanceControllerOutAttendance({
         authorization,
       });
       await fetchAttendance();

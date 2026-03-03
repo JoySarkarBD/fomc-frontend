@@ -12,7 +12,7 @@ export type CreateSellsShiftManagementDto = {
      */
     weekEndDate: string;
     /**
-     * The type of shift for the sells shift management
+     * The type of shift for the sells shift management - MORNING, EVENING, NIGHT
      */
     shiftType: CreateSellsShiftManagementDto.shiftType;
     /**
@@ -22,7 +22,7 @@ export type CreateSellsShiftManagementDto = {
 };
 export namespace CreateSellsShiftManagementDto {
     /**
-     * The type of shift for the sells shift management
+     * The type of shift for the sells shift management - MORNING, EVENING, NIGHT
      */
     export enum shiftType {
         MORNING = 'MORNING',

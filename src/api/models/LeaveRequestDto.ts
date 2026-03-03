@@ -4,7 +4,7 @@
 /* eslint-disable */
 export type LeaveRequestDto = {
     /**
-     * The type of the leave request
+     * The type of the leave request - SICK_LEAVE, CASUAL_LEAVE, GOVERNMENT_FESTIVAL_HOLIDAY
      */
     type: LeaveRequestDto.type;
     /**
@@ -22,7 +22,7 @@ export type LeaveRequestDto = {
 };
 export namespace LeaveRequestDto {
     /**
-     * The type of the leave request
+     * The type of the leave request - SICK_LEAVE, CASUAL_LEAVE, GOVERNMENT_FESTIVAL_HOLIDAY
      */
     export enum type {
         SICK_LEAVE = 'SICK_LEAVE',

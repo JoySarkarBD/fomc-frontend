@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,16 +12,62 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CloudUpload } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { LeaveManagementService } from "@/api";
+import { LeaveRequestDto } from "@/api/models/LeaveRequestDto";
+import { useAccessToken } from "@/hooks/useAccessToken";
 
-/** Demo options — replace with API data later */
-const LEAVE_TYPE_OPTIONS = ["Casual Leave", "Sick Leave"];
+const LEAVE_TYPE_OPTIONS: { value: LeaveRequestDto.type; label: string }[] = [
+  { value: LeaveRequestDto.type.SICK_LEAVE, label: "Sick Leave" },
+  { value: LeaveRequestDto.type.CASUAL_LEAVE, label: "Casual Leave" },
+  {
+    value: LeaveRequestDto.type.GOVERNMENT_FESTIVAL_HOLIDAY,
+    label: "Government Festival Holiday",
+  },
+];
 
 export function AddLeaveRequestForm({ onSubmit }: { onSubmit?: () => void }) {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const token = useAccessToken();
+  const [leaveType, setLeaveType] = useState<LeaveRequestDto.type | "">("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [reason, setReason] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const resetForm = () => {
+    setLeaveType("");
+    setStartDate("");
+    setEndDate("");
+    setReason("");
+    setSubmitting(false);
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // TODO: integrate with API
-    onSubmit?.();
+    if (!token || !leaveType || !startDate || !endDate || !reason.trim()) return;
+
+    setSubmitting(true);
+    try {
+      await LeaveManagementService.leaveControllerCreateLeaveRequest({
+        authorization: token,
+        requestBody: {
+          type: leaveType,
+          startDate: new Date(startDate).toISOString(),
+          endDate: new Date(endDate).toISOString(),
+          reason: reason.trim(),
+        },
+      });
+      toast.success("Leave request submitted successfully.");
+      resetForm();
+      onSubmit?.();
+    } catch (err: any) {
+      const msg =
+        err?.body?.message ?? "Failed to submit leave request. Please try again.";
+      toast.error(msg);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -33,64 +80,55 @@ export function AddLeaveRequestForm({ onSubmit }: { onSubmit?: () => void }) {
         >
           Leave Type <span className="text-red-500">*</span>
         </Label>
-        <Select required>
+        <Select
+          value={leaveType}
+          onValueChange={(v) => setLeaveType(v as LeaveRequestDto.type)}
+          required
+        >
           <SelectTrigger
             id="leaveType"
             className="h-11 w-full border-border/60 bg-white text-muted-foreground/50"
           >
-            <SelectValue placeholder="Leave Type" />
+            <SelectValue placeholder="Select Leave Type" />
           </SelectTrigger>
           <SelectContent>
-            {LEAVE_TYPE_OPTIONS.map((leave) => (
-              <SelectItem key={leave} value={leave}>
-                {leave}
+            {LEAVE_TYPE_OPTIONS.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
 
-      {/* From Date */}
+      {/* Start Date */}
       <div className="space-y-1.5">
-        <Label htmlFor="from" className="text-sm font-medium text-foreground">
-          From Date <span className="text-red-500">*</span>
+        <Label htmlFor="startDate" className="text-sm font-medium text-foreground">
+          Start Date <span className="text-red-500">*</span>
         </Label>
         <Input
-          id="from"
+          id="startDate"
           type="date"
-          placeholder="Select From Date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
           required
-          className="h-11 w-full border-border/60 bg-white placeholder:text-muted-foreground/50 [&::-webkit-calendar-picker-indicator]:opacity-50 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+          className="h-11 w-full border-border/60 bg-white placeholder:text-muted-foreground/50 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-50"
         />
       </div>
 
-      {/* To Date */}
+      {/* End Date */}
       <div className="space-y-1.5">
-        <Label htmlFor="to" className="text-sm font-medium text-foreground">
-          To Date <span className="text-red-500">*</span>
+        <Label htmlFor="endDate" className="text-sm font-medium text-foreground">
+          End Date <span className="text-red-500">*</span>
         </Label>
         <Input
-          id="to"
+          id="endDate"
           type="date"
-          placeholder="Select To Date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          min={startDate || undefined}
           required
-          className="h-11 w-full border-border/60 bg-white placeholder:text-muted-foreground/50 [&::-webkit-calendar-picker-indicator]:opacity-50 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
-        />
-      </div>
-
-      {/* Number of days */}
-      <div className="space-y-1.5">
-        <Label
-          htmlFor="numberOfDays"
-          className="text-sm font-medium text-foreground"
-        >
-          Number Of Days <span className="text-red-500">*</span>
-        </Label>
-        <Input
-          id="numberOfDays"
-          placeholder="Number of days"
-          required
-          className="h-11 w-full border-border/60 bg-white placeholder:text-muted-foreground/50"
+          className="h-11 w-full border-border/60 bg-white placeholder:text-muted-foreground/50 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-50"
         />
       </div>
 
@@ -99,43 +137,32 @@ export function AddLeaveRequestForm({ onSubmit }: { onSubmit?: () => void }) {
         <Label htmlFor="reason" className="text-sm font-medium text-foreground">
           Reason <span className="text-red-500">*</span>
         </Label>
-        <Input
+        <Textarea
           id="reason"
           placeholder="Reason for leave"
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
           required
-          className="h-11 w-full border-border/60 bg-white placeholder:text-muted-foreground/50"
+          rows={3}
+          className="w-full border-border/60 bg-white placeholder:text-muted-foreground/50"
         />
-      </div>
-      <div className="mt-3 sm:mt-4">
-        <p className="mb-2 text-sm font-semibold text-foreground/80">
-          Attach Documents <span className="text-red-500">*</span>
-        </p>
-
-        <div className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-sm border-2 border-dashed border-border/60 bg-gray-50 py-6 transition-colors hover:border-brand-navy/30 hover:bg-gray-100 sm:gap-3 sm:py-10">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50">
-            <CloudUpload className="h-5 w-5 text-brand-navy-light" />
-          </div>
-          <div className="text-center">
-            <p className="text-sm font-medium text-foreground/90">
-              <span className="font-bold text-brand-navy hover:underline">
-                Click to Upload
-              </span>{" "}
-              or drag and drop
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              (Max. File size: 25 MB)
-            </p>
-          </div>
-        </div>
       </div>
 
       {/* Submit */}
       <div className="flex justify-end pt-2">
         <Button
           type="submit"
+          disabled={submitting}
           className="h-10 rounded-sm bg-brand-navy px-8 text-sm font-semibold transition-all hover:bg-brand-navy-dark hover:shadow-md active:scale-[0.98]"
         >
-          Save
+          {submitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Submitting…
+            </>
+          ) : (
+            "Submit"
+          )}
         </Button>
       </div>
     </form>

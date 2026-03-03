@@ -16,7 +16,7 @@ export type AttendanceByAuthorityDto = {
      */
     date?: string;
     /**
-     * The type of attendance to mark for the user
+     * The type of attendance to mark for the user - PRESENT, LATE, ABSENT, ON_LEAVE, WEEKEND, WORK_FROM_HOME
      */
     inType: AttendanceByAuthorityDto.inType;
     /**
@@ -26,7 +26,7 @@ export type AttendanceByAuthorityDto = {
 };
 export namespace AttendanceByAuthorityDto {
     /**
-     * The type of attendance to mark for the user
+     * The type of attendance to mark for the user - PRESENT, LATE, ABSENT, ON_LEAVE, WEEKEND, WORK_FROM_HOME
      */
     export enum inType {
         PRESENT = 'PRESENT',

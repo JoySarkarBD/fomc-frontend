@@ -8,11 +8,11 @@ export type RequestShiftExchangeDto = {
      */
     exchangeDate: string;
     /**
-     * Current assigned shift
+     * Current assigned shift - MORNING, EVENING, NIGHT
      */
     originalShift: RequestShiftExchangeDto.originalShift;
     /**
-     * Requested new shift
+     * Requested new shift - MORNING, EVENING, NIGHT
      */
     newShift: RequestShiftExchangeDto.newShift;
     /**
@@ -22,7 +22,7 @@ export type RequestShiftExchangeDto = {
 };
 export namespace RequestShiftExchangeDto {
     /**
-     * Current assigned shift
+     * Current assigned shift - MORNING, EVENING, NIGHT
      */
     export enum originalShift {
         MORNING = 'MORNING',
@@ -30,7 +30,7 @@ export namespace RequestShiftExchangeDto {
         NIGHT = 'NIGHT',
     }
     /**
-     * Requested new shift
+     * Requested new shift - MORNING, EVENING, NIGHT
      */
     export enum newShift {
         MORNING = 'MORNING',

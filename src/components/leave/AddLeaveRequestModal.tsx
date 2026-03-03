@@ -11,11 +11,13 @@ import { AddLeaveRequestForm } from "./AddLeaveRequestForm";
 interface AddLeaveRequestModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSubmitted?: () => void;
 }
 
 export function AddLeaveRequestModal({
   open,
   onOpenChange,
+  onSubmitted,
 }: AddLeaveRequestModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -26,7 +28,7 @@ export function AddLeaveRequestModal({
           </DialogTitle>
         </DialogHeader>
 
-        <AddLeaveRequestForm onSubmit={() => onOpenChange(false)} />
+        <AddLeaveRequestForm onSubmit={onSubmitted ?? (() => onOpenChange(false))} />
       </DialogContent>
     </Dialog>
   );
