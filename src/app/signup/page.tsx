@@ -17,8 +17,8 @@ import {
 } from "@/components/ui/select";
 import {
   AuthenticationService,
-  DepartmentService,
-  RoleService,
+  DepartmentManagementService,
+  RoleManagementService,
   ApiError,
 } from "@/api";
 
@@ -69,7 +69,7 @@ export default function SignUpPage() {
     if (deptFetched.current) return;
     setDeptLoading(true);
     try {
-      const res = await DepartmentService.departmentControllerFindAll({
+      const res = await DepartmentManagementService.departmentControllerFindAll({
         pageNo: 1,
         pageSize: 100,
       });
@@ -89,7 +89,7 @@ export default function SignUpPage() {
     setDesignations([]);
     setDesigLoading(true);
     try {
-      const res = await DepartmentService.departmentControllerFindOne({ id: deptId });
+      const res = await DepartmentManagementService.departmentControllerFindOne({ id: deptId });
       const data = (res as { data?: { designations?: SelectOption[] } }).data;
       setDesignations(Array.isArray(data?.designations) ? data.designations : []);
     } catch (err) {
@@ -104,7 +104,7 @@ export default function SignUpPage() {
     if (roleFetched.current) return;
     setRoleLoading(true);
     try {
-      const res = await RoleService.roleControllerFindAll({
+      const res = await RoleManagementService.roleControllerFindAll({
         pageNo: 1,
         pageSize: 100,
       });

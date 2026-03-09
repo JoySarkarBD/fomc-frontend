@@ -1,8 +1,12 @@
 "use client";
 
+import { useState } from "react";
+import { LayoutList } from "lucide-react";
 import { ModalTable, type ColumnDef } from "@/components/shared";
 import { ProjectsModalRow } from "./ProjectsModalRow";
+import { ProfileManagementModal } from "./ProfileManagementModal";
 import { DEMO_PROJECTS, PROJECT_FILTER_TABS } from "@/constants/project";
+import { useUserInfo } from "@/hooks/useUserInfo";
 import type { Project, ProjectStatus } from "@/types/project";
 
 const TOTAL_RECORDS = 97;
@@ -18,6 +22,12 @@ const COLUMNS: ColumnDef[] = [
 ];
 
 export function ProjectsModalTable() {
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const { department } = useUserInfo();
+
+  // Only SALES department can manage profiles
+  const isSalesDept = department?.toUpperCase() === "SALES";
+
   const handleFilterData = (
     data: Project[],
     filter: ProjectStatus | "all",
@@ -25,27 +35,56 @@ export function ProjectsModalTable() {
   ): Project[] => {
     return data.filter((project) => {
       const matchesFilter = filter === "all" || project.status === filter;
-      const matchesSearch = project.projectName.toLowerCase().includes(search.toLowerCase());
+      const matchesSearch = project.projectName
+        .toLowerCase()
+        .includes(search.toLowerCase());
       return matchesFilter && matchesSearch;
     });
   };
 
   return (
-    <ModalTable<Project, ProjectStatus | "all">
-      data={DEMO_PROJECTS}
-      columns={COLUMNS}
-      totalRecords={TOTAL_RECORDS}
-      filterTabs={PROJECT_FILTER_TABS}
-      defaultFilter="all"
-      onFilterData={handleFilterData}
-      enableSearch={true}
-      searchPlaceholder="Search..."
-      renderRow={(project, index) => (
-        <ProjectsModalRow key={project.id} project={project} rowNumber={index + 1} />
+    <div className="space-y-4">
+      {/* Top-right Profile button — SALES only */}
+      {isSalesDept && (
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => setIsProfileModalOpen(true)}
+            className="inline-flex items-center gap-2 rounded-sm bg-brand-navy px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-brand-navy-dark hover:shadow-md active:scale-[0.98]"
+          >
+            <LayoutList className="h-4 w-4" />
+            Profile
+          </button>
+        </div>
       )}
-      enableCheckboxes={true}
-      rowsPerPageOptions={[10, 20, 50, 100]}
-      defaultRowsPerPage={10}
-    />
+
+      {/* Projects table */}
+      <ModalTable<Project, ProjectStatus | "all">
+        data={DEMO_PROJECTS}
+        columns={COLUMNS}
+        totalRecords={TOTAL_RECORDS}
+        filterTabs={PROJECT_FILTER_TABS}
+        defaultFilter="all"
+        onFilterData={handleFilterData}
+        enableSearch={true}
+        searchPlaceholder="Search..."
+        renderRow={(project, index) => (
+          <ProjectsModalRow
+            key={project.id}
+            project={project}
+            rowNumber={index + 1}
+          />
+        )}
+        enableCheckboxes={true}
+        rowsPerPageOptions={[10, 20, 50, 100]}
+        defaultRowsPerPage={10}
+      />
+
+      {/* Profile Management Modal */}
+      <ProfileManagementModal
+        open={isProfileModalOpen}
+        onOpenChange={setIsProfileModalOpen}
+      />
+    </div>
   );
 }

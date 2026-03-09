@@ -94,76 +94,6 @@ export class ProjectManagementService {
         });
     }
     /**
-     * Get project by ID
-     * Retrieves details of a specific project.
-     * @returns any
-     * @throws ApiError
-     */
-    public static projectControllerFindOne({
-        authorization,
-    }: {
-        /**
-         * Bearer token
-         */
-        authorization: string,
-    }): CancelablePromise<ProjectByIdSuccessDto> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/project/{id}',
-            headers: {
-                'Authorization': authorization,
-            },
-        });
-    }
-    /**
-     * Update project
-     * Updates an existing project record.
-     * @returns any
-     * @throws ApiError
-     */
-    public static projectControllerUpdate({
-        authorization,
-        requestBody,
-    }: {
-        /**
-         * Bearer token
-         */
-        authorization: string,
-        requestBody: UpdateProjectDto,
-    }): CancelablePromise<ProjectUpdateSuccessDto> {
-        return __request(OpenAPI, {
-            method: 'PATCH',
-            url: '/api/project/{id}',
-            headers: {
-                'Authorization': authorization,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-        });
-    }
-    /**
-     * Delete project
-     * Deletes a project record.
-     * @returns any
-     * @throws ApiError
-     */
-    public static projectControllerRemove({
-        authorization,
-    }: {
-        /**
-         * Bearer token
-         */
-        authorization: string,
-    }): CancelablePromise<ProjectDeleteSuccessDto> {
-        return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/api/project/{id}',
-            headers: {
-                'Authorization': authorization,
-            },
-        });
-    }
-    /**
      * Create client
      * Creates a new client record.
      * @returns any
@@ -206,54 +136,6 @@ export class ProjectManagementService {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/project/client',
-            headers: {
-                'Authorization': authorization,
-            },
-        });
-    }
-    /**
-     * Update client
-     * Updates an existing client record.
-     * @returns any
-     * @throws ApiError
-     */
-    public static projectControllerUpdateClient({
-        authorization,
-        requestBody,
-    }: {
-        /**
-         * Bearer token
-         */
-        authorization: string,
-        requestBody: UpdateClientDto,
-    }): CancelablePromise<ClientUpdateSuccessDto> {
-        return __request(OpenAPI, {
-            method: 'PATCH',
-            url: '/api/project/client/{id}',
-            headers: {
-                'Authorization': authorization,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-        });
-    }
-    /**
-     * Delete client
-     * Deletes a client record.
-     * @returns any
-     * @throws ApiError
-     */
-    public static projectControllerDeleteClient({
-        authorization,
-    }: {
-        /**
-         * Bearer token
-         */
-        authorization: string,
-    }): CancelablePromise<ClientDeleteSuccessDto> {
-        return __request(OpenAPI, {
-            method: 'DELETE',
-            url: '/api/project/client/{id}',
             headers: {
                 'Authorization': authorization,
             },
@@ -308,15 +190,178 @@ export class ProjectManagementService {
         });
     }
     /**
+     * Get project by ID
+     * Retrieves details of a specific project.
+     * @returns any
+     * @throws ApiError
+     */
+    public static projectControllerFindOne({
+        id,
+        authorization,
+    }: {
+        /**
+         * The ID of the project to retrieve
+         */
+        id: string,
+        /**
+         * Bearer token
+         */
+        authorization: string,
+    }): CancelablePromise<ProjectByIdSuccessDto> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/project/{id}',
+            path: {
+                'id': id,
+            },
+            headers: {
+                'Authorization': authorization,
+            },
+        });
+    }
+    /**
+     * Update project
+     * Updates an existing project record.
+     * @returns any
+     * @throws ApiError
+     */
+    public static projectControllerUpdate({
+        id,
+        authorization,
+        requestBody,
+    }: {
+        /**
+         * The ID of the project to retrieve
+         */
+        id: string,
+        /**
+         * Bearer token
+         */
+        authorization: string,
+        requestBody: UpdateProjectDto,
+    }): CancelablePromise<ProjectUpdateSuccessDto> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/api/project/{id}',
+            path: {
+                'id': id,
+            },
+            headers: {
+                'Authorization': authorization,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+    /**
+     * Delete project
+     * Deletes a project record.
+     * @returns any
+     * @throws ApiError
+     */
+    public static projectControllerRemove({
+        id,
+        authorization,
+    }: {
+        /**
+         * The ID of the project to retrieve
+         */
+        id: string,
+        /**
+         * Bearer token
+         */
+        authorization: string,
+    }): CancelablePromise<ProjectDeleteSuccessDto> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/project/{id}',
+            path: {
+                'id': id,
+            },
+            headers: {
+                'Authorization': authorization,
+            },
+        });
+    }
+    /**
+     * Update client
+     * Updates an existing client record.
+     * @returns any
+     * @throws ApiError
+     */
+    public static projectControllerUpdateClient({
+        id,
+        authorization,
+        requestBody,
+    }: {
+        /**
+         * The ID of the project to retrieve
+         */
+        id: string,
+        /**
+         * Bearer token
+         */
+        authorization: string,
+        requestBody: UpdateClientDto,
+    }): CancelablePromise<ClientUpdateSuccessDto> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/api/project/client/{id}',
+            path: {
+                'id': id,
+            },
+            headers: {
+                'Authorization': authorization,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+        });
+    }
+    /**
+     * Delete client
+     * Deletes a client record.
+     * @returns any
+     * @throws ApiError
+     */
+    public static projectControllerDeleteClient({
+        id,
+        authorization,
+    }: {
+        /**
+         * The ID of the client to retrieve
+         */
+        id: string,
+        /**
+         * Bearer token
+         */
+        authorization: string,
+    }): CancelablePromise<ClientDeleteSuccessDto> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/project/client/{id}',
+            path: {
+                'id': id,
+            },
+            headers: {
+                'Authorization': authorization,
+            },
+        });
+    }
+    /**
      * Update profile
      * Updates an existing profile record.
      * @returns any
      * @throws ApiError
      */
     public static projectControllerUpdateProfile({
+        id,
         authorization,
         requestBody,
     }: {
+        /**
+         * The ID of the profile to retrieve
+         */
+        id: string,
         /**
          * Bearer token
          */
@@ -326,6 +371,9 @@ export class ProjectManagementService {
         return __request(OpenAPI, {
             method: 'PATCH',
             url: '/api/project/profile/{id}',
+            path: {
+                'id': id,
+            },
             headers: {
                 'Authorization': authorization,
             },
@@ -340,8 +388,13 @@ export class ProjectManagementService {
      * @throws ApiError
      */
     public static projectControllerDeleteProfile({
+        id,
         authorization,
     }: {
+        /**
+         * The ID of the profile to retrieve
+         */
+        id: string,
         /**
          * Bearer token
          */
@@ -350,6 +403,9 @@ export class ProjectManagementService {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/api/project/profile/{id}',
+            path: {
+                'id': id,
+            },
             headers: {
                 'Authorization': authorization,
             },

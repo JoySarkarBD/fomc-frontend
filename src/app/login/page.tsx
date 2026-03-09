@@ -8,7 +8,7 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { AuthenticationService, ApiError, AttendanceService } from "@/api";
+import { AuthenticationService, ApiError } from "@/api";
 import { useAuth } from "@/hooks/useAuth";
 import type { AuthUser } from "@/components/shared/AuthProvider";
 

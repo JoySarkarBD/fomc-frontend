@@ -37,7 +37,7 @@ import {
   DepartmentManagementService,
   SellsShiftManagementService,
 } from "@/api";
-import { CreateSellsShiftManagementDto } from "@/api/models/CreateSellsShiftManagementDto";
+import { CreateSellsShiftDto } from "@/api/models/CreateSellsShiftDto";
 import { useAccessToken } from "@/hooks/useAccessToken";
 import {
   startOfWeek,
@@ -69,12 +69,12 @@ interface AssignShiftModalProps {
 }
 
 const SHIFT_OPTIONS: {
-  value: CreateSellsShiftManagementDto.shiftType;
+  value: CreateSellsShiftDto.shiftType;
   label: string;
 }[] = [
-  { value: CreateSellsShiftManagementDto.shiftType.MORNING, label: "Morning Shift" },
-  { value: CreateSellsShiftManagementDto.shiftType.EVENING, label: "Evening Shift" },
-  { value: CreateSellsShiftManagementDto.shiftType.NIGHT, label: "Night Shift" },
+  { value: CreateSellsShiftDto.shiftType.MORNING, label: "Morning Shift" },
+  { value: CreateSellsShiftDto.shiftType.EVENING, label: "Evening Shift" },
+  { value: CreateSellsShiftDto.shiftType.NIGHT, label: "Night Shift" },
 ];
 
 /* ── Helpers ─────────────────────────────────────────────── */
@@ -115,7 +115,7 @@ export function AssignShiftModal({
   const [weekRange, setWeekRange] = useState<DateRange | undefined>(undefined);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [shiftType, setShiftType] = useState<
-    CreateSellsShiftManagementDto.shiftType | ""
+    CreateSellsShiftDto.shiftType | ""
   >("");
   const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -409,7 +409,7 @@ export function AssignShiftModal({
             <Select
               value={shiftType}
               onValueChange={(v) =>
-                setShiftType(v as CreateSellsShiftManagementDto.shiftType)
+                setShiftType(v as CreateSellsShiftDto.shiftType)
               }
             >
               <SelectTrigger className="w-full">

@@ -20,10 +20,6 @@ export type CreateProjectDto = {
      */
     profile?: string;
     /**
-     * The ID of the sales member associated with the project
-     */
-    salesMember?: string;
-    /**
      * The ID of the department currently assigned to the project
      */
     assignedDepartment?: string;

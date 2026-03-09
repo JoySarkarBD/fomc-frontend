@@ -28,11 +28,11 @@ export const SIDEBAR_NAV_ITEMS: NavItem[] = [
     href: "/projects",
     icon: ProjectIcon,
   },
-  {
-    label: "Team Members",
-    href: "/team-members",
-    icon: TeamMemberIcon,
-  },
+  // {
+  //   label: "Team Members",
+  //   href: "/team-members",
+  //   icon: TeamMemberIcon,
+  // },
   {
     label: "Attendance",
     href: "/attendance",
