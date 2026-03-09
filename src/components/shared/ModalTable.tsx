@@ -52,6 +52,13 @@ interface ModalTableProps<TData, TFilter = string> {
 
   // Optional: Show DCR List Button
   showDCRButton?: boolean;
+
+  // Optional: External control callbacks (for server-side search/pagination)
+  onSearchChange?: (value: string) => void;
+  onPageChange?: (page: number) => void;
+  onRowsPerPageChange?: (rows: number) => void;
+  externalPage?: number;
+  externalRowsPerPage?: number;
 }
 
 export function ModalTable<TData, TFilter = string>({
@@ -68,6 +75,11 @@ export function ModalTable<TData, TFilter = string>({
   rowsPerPageOptions = [10, 20, 50, 100],
   defaultRowsPerPage = 10,
   showDCRButton = false,
+  onSearchChange,
+  onPageChange,
+  onRowsPerPageChange,
+  externalPage,
+  externalRowsPerPage,
 }: ModalTableProps<TData, TFilter>) {
   const [activeFilter, setActiveFilter] = useState<TFilter | undefined>(
     defaultFilter,
@@ -87,12 +99,16 @@ export function ModalTable<TData, TFilter = string>({
   const endRecord = Math.min(currentPage * rowsPerPage, totalRecords);
 
   const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+      onPageChange?.(page);
+    }
   };
 
   const handleRowsPerPageChange = (rows: number) => {
     setRowsPerPage(rows);
     setCurrentPage(1);
+    onRowsPerPageChange?.(rows);
   };
 
   return (
@@ -125,7 +141,10 @@ export function ModalTable<TData, TFilter = string>({
                   type="text"
                   placeholder={searchPlaceholder}
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    onSearchChange?.(e.target.value);
+                  }}
                   className="pl-9"
                 />
               </div>
