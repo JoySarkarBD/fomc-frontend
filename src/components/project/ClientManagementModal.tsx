@@ -21,6 +21,16 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Table,
   TableBody,
   TableCell,
@@ -86,6 +96,7 @@ export function ClientManagementModal({
   const [updating, setUpdating] = useState(false);
 
   // ── Delete state ─────────────────────────────────────────
+  const [deleteTarget, setDeleteTarget] = useState<Client | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   /* ── Fetch all clients ───────────────────────────────────── */
@@ -197,8 +208,17 @@ export function ClientManagementModal({
   };
 
   /* ── Delete ──────────────────────────────────────────────── */
-  const handleDelete = async (client: Client) => {
-    if (!token || deletingId) return;
+  // Step 1: open confirmation dialog
+  const handleDeleteClick = (client: Client) => {
+    if (deletingId) return;
+    setDeleteTarget(client);
+  };
+
+  // Step 2: confirmed — run the actual API call
+  const confirmDelete = async () => {
+    if (!deleteTarget || !token) return;
+    const client = deleteTarget;
+    setDeleteTarget(null);
     setDeletingId(client._id);
     try {
       await ProjectManagementService.projectControllerDeleteClient({
@@ -221,7 +241,8 @@ export function ClientManagementModal({
 
   /* ─── Render ─────────────────────────────────────────────── */
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[90vh] w-[calc(100vw-2rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl">
         <DialogTitle className="sr-only">Client Management</DialogTitle>
         <DialogDescription className="sr-only">
@@ -444,7 +465,7 @@ export function ClientManagementModal({
                               {/* Delete */}
                               <button
                                 type="button"
-                                onClick={() => handleDelete(client)}
+                                onClick={() => handleDeleteClick(client)}
                                 disabled={anyAction}
                                 title="Delete client"
                                 className="flex h-7 w-7 items-center justify-center rounded-sm text-red-600 transition-colors hover:bg-red-50 disabled:opacity-40"
@@ -532,5 +553,34 @@ export function ClientManagementModal({
         )}
       </DialogContent>
     </Dialog>
+
+    {/* ── Delete confirmation dialog ──────────────────────── */}
+    <AlertDialog
+      open={!!deleteTarget}
+      onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+    >
+      <AlertDialogContent size="sm">
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete Client</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to delete{" "}
+            <span className="font-semibold text-foreground">
+              &ldquo;{deleteTarget?.name}&rdquo;
+            </span>
+            ? This action cannot be undone.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={confirmDelete}
+            className="bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-600"
+          >
+            Delete
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }

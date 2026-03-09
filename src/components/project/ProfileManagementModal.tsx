@@ -21,6 +21,16 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Table,
   TableBody,
   TableCell,
@@ -86,6 +96,7 @@ export function ProfileManagementModal({
   const [updating, setUpdating] = useState(false);
 
   // ── Delete state ─────────────────────────────────────────
+  const [deleteTarget, setDeleteTarget] = useState<Profile | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   /* ── Fetch all profiles ──────────────────────────────────── */
@@ -197,8 +208,17 @@ export function ProfileManagementModal({
   };
 
   /* ── Delete ──────────────────────────────────────────────── */
-  const handleDelete = async (profile: Profile) => {
-    if (!token || deletingId) return;
+  // Step 1: open confirmation dialog
+  const handleDeleteClick = (profile: Profile) => {
+    if (deletingId) return;
+    setDeleteTarget(profile);
+  };
+
+  // Step 2: confirmed — run the actual API call
+  const confirmDelete = async () => {
+    if (!deleteTarget || !token) return;
+    const profile = deleteTarget;
+    setDeleteTarget(null);
     setDeletingId(profile._id);
     try {
       await ProjectManagementService.projectControllerDeleteProfile({
@@ -207,12 +227,8 @@ export function ProfileManagementModal({
       });
       toast.success(`Profile "${profile.name}" deleted.`);
       setProfiles((prev) => prev.filter((p) => p._id !== profile._id));
-      // Adjust page if needed
       const newTotal = profiles.length - 1;
-      const newTotalPages = Math.max(
-        1,
-        Math.ceil(newTotal / rowsPerPage)
-      );
+      const newTotalPages = Math.max(1, Math.ceil(newTotal / rowsPerPage));
       if (currentPage > newTotalPages) setCurrentPage(newTotalPages);
     } catch (err: any) {
       const msg =
@@ -225,7 +241,8 @@ export function ProfileManagementModal({
 
   /* ─── Render ─────────────────────────────────────────────── */
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[90vh] w-[calc(100vw-2rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl">
         <DialogTitle className="sr-only">Profile Management</DialogTitle>
         <DialogDescription className="sr-only">
@@ -449,7 +466,7 @@ export function ProfileManagementModal({
                               {/* Delete */}
                               <button
                                 type="button"
-                                onClick={() => handleDelete(profile)}
+                                onClick={() => handleDeleteClick(profile)}
                                 disabled={anyAction}
                                 title="Delete profile"
                                 className="flex h-7 w-7 items-center justify-center rounded-sm text-red-600 transition-colors hover:bg-red-50 disabled:opacity-40"
@@ -537,5 +554,34 @@ export function ProfileManagementModal({
         )}
       </DialogContent>
     </Dialog>
+
+    {/* ── Delete confirmation dialog ──────────────────────── */}
+    <AlertDialog
+      open={!!deleteTarget}
+      onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
+    >
+      <AlertDialogContent size="sm">
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete Profile</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to delete{" "}
+            <span className="font-semibold text-foreground">
+              &ldquo;{deleteTarget?.name}&rdquo;
+            </span>
+            ? This action cannot be undone.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={confirmDelete}
+            className="bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-600"
+          >
+            Delete
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }
