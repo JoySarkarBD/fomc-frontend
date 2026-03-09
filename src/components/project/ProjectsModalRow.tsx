@@ -1,9 +1,13 @@
+import { Eye, Edit2, Trash2 } from "lucide-react";
 import { TableCell, TableRow } from "@/components/ui/table";
 import type { Project, ProjectStatus } from "@/types/project";
 
 interface ProjectsModalRowProps {
   project: Project;
   rowNumber: number;
+  onView: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
 }
 
 /* ── Status badge config ────────────────────────────────────── */
@@ -31,6 +35,9 @@ function resolveName(
 export function ProjectsModalRow({
   project,
   rowNumber,
+  onView,
+  onEdit,
+  onDelete,
 }: ProjectsModalRowProps) {
   const statusCfg = STATUS_CONFIG[project.status] ?? STATUS_CONFIG["NULL"];
 
@@ -98,10 +105,37 @@ export function ProjectsModalRow({
       {/* Status */}
       <TableCell className="whitespace-nowrap py-3.5">
         <span
-          className={`inline-block rounded-sm px-2.5 py-1 text-center text-xs font-semibold ${statusCfg.bg} ${statusCfg.text}`}
+          className={`inline-block w-24 rounded-sm px-2.5 py-1 text-center text-xs font-semibold ${statusCfg.bg} ${statusCfg.text}`}
         >
           {statusCfg.label}
         </span>
+      </TableCell>
+
+      {/* Actions */}
+      <TableCell className="whitespace-nowrap py-3.5 pl-6 text-sm text-muted-foreground">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onView}
+            className="text-brand-navy hover:text-brand-navy-dark transition-colors"
+            title="View Details"
+          >
+            <Eye className="h-4 w-4" />
+          </button>
+          <button
+            onClick={onEdit}
+            className="text-orange-500 hover:text-orange-600 transition-colors"
+            title="Update Project"
+          >
+            <Edit2 className="h-4 w-4" />
+          </button>
+          <button
+            onClick={onDelete}
+            className="text-red-500 hover:text-red-600 transition-colors"
+            title="Delete Project"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        </div>
       </TableCell>
     </TableRow>
   );

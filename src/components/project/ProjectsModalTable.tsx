@@ -9,6 +9,19 @@ import { ProjectsModalRow } from "./ProjectsModalRow";
 import { ProfileManagementModal } from "./ProfileManagementModal";
 import { ClientManagementModal } from "./ClientManagementModal";
 import { CreateProjectModal } from "./CreateProjectModal";
+import { UpdateProjectModal } from "./UpdateProjectModal";
+import { ViewProjectModal } from "./ViewProjectModal";
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 import { ProjectManagementService } from "@/api";
 import { useAccessToken } from "@/hooks/useAccessToken";
@@ -24,6 +37,7 @@ const COLUMNS: ColumnDef[] = [
   { key: "profile",     label: "Profile"      },
   { key: "projectFile", label: "Project File" },
   { key: "status",      label: "Status"       },
+  { key: "actions",     label: "Actions",     className: "w-[120px]" },
 ];
 
 /* ─── Status filter tabs ──────────────────────────────────── */
@@ -51,6 +65,13 @@ export function ProjectsModalTable() {
   const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
+
+  /* ── Action Modals state ────────────────────────────────── */
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [isViewOpen, setIsViewOpen] = useState(false);
+  const [isUpdateOpen, setIsUpdateOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   /* ── Data state ─────────────────────────────────────────── */
   const [projects, setProjects] = useState<Project[]>([]);
@@ -130,6 +151,39 @@ export function ProjectsModalTable() {
   const handleRowsPerPageChange = (rows: number) => {
     setRowsPerPage(rows);
     setCurrentPage(1);
+  };
+
+  const openView = (id: string) => {
+    setSelectedProjectId(id);
+    setIsViewOpen(true);
+  };
+
+  const openEdit = (id: string) => {
+    setSelectedProjectId(id);
+    setIsUpdateOpen(true);
+  };
+
+  const openDelete = (id: string) => {
+    setSelectedProjectId(id);
+    setIsDeleteOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedProjectId || !token) return;
+    setIsDeleting(true);
+    try {
+      await ProjectManagementService.projectControllerRemove({
+        id: selectedProjectId,
+        authorization: token,
+      });
+      toast.success("Project deleted successfully");
+      fetchProjects();
+      setIsDeleteOpen(false);
+    } catch (err: any) {
+      toast.error(err?.body?.message || "Failed to delete project");
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   /* ── ModalTable passthrough (no client-side filter) ──────── */
@@ -245,6 +299,9 @@ export function ProjectsModalTable() {
               key={project._id}
               project={project}
               rowNumber={(currentPage - 1) * rowsPerPage + index + 1}
+              onView={() => openView(project._id)}
+              onEdit={() => openEdit(project._id)}
+              onDelete={() => openDelete(project._id)}
             />
           )}
           enableCheckboxes={true}
@@ -269,6 +326,54 @@ export function ProjectsModalTable() {
         open={isClientModalOpen}
         onOpenChange={setIsClientModalOpen}
       />
+
+      {/* ── Action Modals ────────────────────────────────────── */}
+      <ViewProjectModal
+        projectId={selectedProjectId}
+        open={isViewOpen}
+        onOpenChange={setIsViewOpen}
+      />
+
+      <UpdateProjectModal
+        projectId={selectedProjectId}
+        open={isUpdateOpen}
+        onOpenChange={setIsUpdateOpen}
+        onUpdated={fetchProjects}
+      />
+
+      <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+        <AlertDialogContent className="rounded-sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-foreground">Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the project
+              and remove its data from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting} className="rounded-sm h-9">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700 text-white rounded-sm h-9"
+              onClick={(e) => {
+                e.preventDefault();
+                confirmDelete();
+              }}
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting
+                </>
+              ) : (
+                "Delete Project"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
