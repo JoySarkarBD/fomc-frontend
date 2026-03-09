@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { LayoutList } from "lucide-react";
+import { LayoutList, Users } from "lucide-react";
 import { ModalTable, type ColumnDef } from "@/components/shared";
 import { ProjectsModalRow } from "./ProjectsModalRow";
 import { ProfileManagementModal } from "./ProfileManagementModal";
+import { ClientManagementModal } from "./ClientManagementModal";
 import { DEMO_PROJECTS, PROJECT_FILTER_TABS } from "@/constants/project";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import type { Project, ProjectStatus } from "@/types/project";
@@ -23,9 +24,10 @@ const COLUMNS: ColumnDef[] = [
 
 export function ProjectsModalTable() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isClientModalOpen, setIsClientModalOpen] = useState(false);
   const { department } = useUserInfo();
 
-  // Only SALES department can manage profiles
+  // Only SALES department can manage profiles & clients
   const isSalesDept = department?.toUpperCase() === "SALES";
 
   const handleFilterData = (
@@ -44,9 +46,20 @@ export function ProjectsModalTable() {
 
   return (
     <div className="space-y-4">
-      {/* Top-right Profile button — SALES only */}
+      {/* Top-right action buttons — SALES only */}
       {isSalesDept && (
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-2">
+          {/* Client button */}
+          <button
+            type="button"
+            onClick={() => setIsClientModalOpen(true)}
+            className="inline-flex items-center gap-2 rounded-sm bg-[#1a6b3c] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-[#155c32] hover:shadow-md active:scale-[0.98]"
+          >
+            <Users className="h-4 w-4" />
+            Client
+          </button>
+
+          {/* Profile button */}
           <button
             type="button"
             onClick={() => setIsProfileModalOpen(true)}
@@ -84,6 +97,12 @@ export function ProjectsModalTable() {
       <ProfileManagementModal
         open={isProfileModalOpen}
         onOpenChange={setIsProfileModalOpen}
+      />
+
+      {/* Client Management Modal */}
+      <ClientManagementModal
+        open={isClientModalOpen}
+        onOpenChange={setIsClientModalOpen}
       />
     </div>
   );

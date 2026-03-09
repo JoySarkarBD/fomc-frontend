@@ -42,7 +42,7 @@ import { useAccessToken } from "@/hooks/useAccessToken";
 import { ProjectManagementService } from "@/api";
 
 /* ─── Types ───────────────────────────────────────────────── */
-interface Profile {
+interface Client {
   _id: string;
   name: string;
   createdAt?: string;
@@ -51,23 +51,23 @@ interface Profile {
 
 /* ─── Helpers ─────────────────────────────────────────────── */
 const ROWS_PER_PAGE_OPTIONS = [5, 10, 20, 50];
-const COLUMNS = ["#", "PROFILE NAME", "ACTION"];
+const COLUMNS = ["#", "CLIENT NAME", "ACTION"];
 
 /* ─── Props ───────────────────────────────────────────────── */
-interface ProfileManagementModalProps {
+interface ClientManagementModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 /* ─── Component ───────────────────────────────────────────── */
-export function ProfileManagementModal({
+export function ClientManagementModal({
   open,
   onOpenChange,
-}: ProfileManagementModalProps) {
+}: ClientManagementModalProps) {
   const token = useAccessToken();
 
   // ── Data state ──────────────────────────────────────────
-  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(false);
 
   // ── Search / pagination ──────────────────────────────────
@@ -88,21 +88,21 @@ export function ProfileManagementModal({
   // ── Delete state ─────────────────────────────────────────
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  /* ── Fetch all profiles ──────────────────────────────────── */
-  const fetchProfiles = useCallback(async () => {
+  /* ── Fetch all clients ───────────────────────────────────── */
+  const fetchClients = useCallback(async () => {
     if (!token) return;
     setLoading(true);
     try {
-      const res = await ProjectManagementService.projectControllerGetProfiles({
+      const res = await ProjectManagementService.projectControllerGetClients({
         authorization: token,
       });
       const data = (res as any)?.data;
-      setProfiles(Array.isArray(data) ? data : []);
+      setClients(Array.isArray(data) ? data : []);
     } catch (err: any) {
       toast.error(
-        err?.body?.message ?? "Failed to load profiles. Please try again."
+        err?.body?.message ?? "Failed to load clients. Please try again."
       );
-      setProfiles([]);
+      setClients([]);
     } finally {
       setLoading(false);
     }
@@ -110,21 +110,21 @@ export function ProfileManagementModal({
 
   useEffect(() => {
     if (open) {
-      fetchProfiles();
+      fetchClients();
       setSearchQuery("");
       setCurrentPage(1);
       setShowCreateRow(false);
       setCreateName("");
       setEditId(null);
     }
-  }, [open, fetchProfiles]);
+  }, [open, fetchClients]);
 
   /* ── Search filter ───────────────────────────────────────── */
   const filtered = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    if (!q) return profiles;
-    return profiles.filter((p) => p.name.toLowerCase().includes(q));
-  }, [profiles, searchQuery]);
+    if (!q) return clients;
+    return clients.filter((c) => c.name.toLowerCase().includes(q));
+  }, [clients, searchQuery]);
 
   /* ── Pagination ──────────────────────────────────────────── */
   const totalRecords = filtered.length;
@@ -139,18 +139,18 @@ export function ProfileManagementModal({
     if (!name || !token) return;
     setCreating(true);
     try {
-      await ProjectManagementService.projectControllerCreateProfile({
+      await ProjectManagementService.projectControllerCreateClient({
         authorization: token,
         requestBody: { name },
       });
-      toast.success(`Profile "${name}" created successfully.`);
+      toast.success(`Client "${name}" created successfully.`);
       setCreateName("");
       setShowCreateRow(false);
-      await fetchProfiles();
+      await fetchClients();
       setCurrentPage(1);
     } catch (err: any) {
       const msg =
-        err?.body?.message ?? "Failed to create profile. Please try again.";
+        err?.body?.message ?? "Failed to create client. Please try again.";
       toast.error(msg);
     } finally {
       setCreating(false);
@@ -163,9 +163,9 @@ export function ProfileManagementModal({
   };
 
   /* ── Edit ────────────────────────────────────────────────── */
-  const startEdit = (profile: Profile) => {
-    setEditId(profile._id);
-    setEditName(profile.name);
+  const startEdit = (client: Client) => {
+    setEditId(client._id);
+    setEditName(client.name);
   };
 
   const handleUpdate = async () => {
@@ -173,18 +173,18 @@ export function ProfileManagementModal({
     if (!name || !editId || !token) return;
     setUpdating(true);
     try {
-      await ProjectManagementService.projectControllerUpdateProfile({
+      await ProjectManagementService.projectControllerUpdateClient({
         id: editId,
         authorization: token,
         requestBody: { name },
       });
-      toast.success(`Profile updated to "${name}".`);
+      toast.success(`Client updated to "${name}".`);
       setEditId(null);
       setEditName("");
-      await fetchProfiles();
+      await fetchClients();
     } catch (err: any) {
       const msg =
-        err?.body?.message ?? "Failed to update profile. Please try again.";
+        err?.body?.message ?? "Failed to update client. Please try again.";
       toast.error(msg);
     } finally {
       setUpdating(false);
@@ -197,26 +197,22 @@ export function ProfileManagementModal({
   };
 
   /* ── Delete ──────────────────────────────────────────────── */
-  const handleDelete = async (profile: Profile) => {
+  const handleDelete = async (client: Client) => {
     if (!token || deletingId) return;
-    setDeletingId(profile._id);
+    setDeletingId(client._id);
     try {
-      await ProjectManagementService.projectControllerDeleteProfile({
-        id: profile._id,
+      await ProjectManagementService.projectControllerDeleteClient({
+        id: client._id,
         authorization: token,
       });
-      toast.success(`Profile "${profile.name}" deleted.`);
-      setProfiles((prev) => prev.filter((p) => p._id !== profile._id));
-      // Adjust page if needed
-      const newTotal = profiles.length - 1;
-      const newTotalPages = Math.max(
-        1,
-        Math.ceil(newTotal / rowsPerPage)
-      );
+      toast.success(`Client "${client.name}" deleted.`);
+      setClients((prev) => prev.filter((c) => c._id !== client._id));
+      const newTotal = clients.length - 1;
+      const newTotalPages = Math.max(1, Math.ceil(newTotal / rowsPerPage));
       if (currentPage > newTotalPages) setCurrentPage(newTotalPages);
     } catch (err: any) {
       const msg =
-        err?.body?.message ?? "Failed to delete profile. Please try again.";
+        err?.body?.message ?? "Failed to delete client. Please try again.";
       toast.error(msg);
     } finally {
       setDeletingId(null);
@@ -227,15 +223,15 @@ export function ProfileManagementModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="flex max-h-[90vh] w-[calc(100vw-2rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl">
-        <DialogTitle className="sr-only">Profile Management</DialogTitle>
+        <DialogTitle className="sr-only">Client Management</DialogTitle>
         <DialogDescription className="sr-only">
-          Create, update, and delete project profiles
+          Create, update, and delete project clients
         </DialogDescription>
 
         {/* ── Header ───────────────────────────────────────── */}
         <div className="shrink-0 px-4 pt-4 sm:px-6 sm:pt-6">
           <h2 className="text-lg font-semibold text-foreground sm:text-xl">
-            Profile Management
+            Client Management
           </h2>
         </div>
 
@@ -247,7 +243,7 @@ export function ProfileManagementModal({
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 type="text"
-                placeholder="Search profiles..."
+                placeholder="Search clients..."
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
@@ -256,7 +252,7 @@ export function ProfileManagementModal({
                 className="h-9 w-full rounded-sm border-border/60 pl-9 pr-3 text-sm focus-visible:ring-1 focus-visible:ring-offset-0"
               />
             </div>
-            {/* New Profile button */}
+            {/* New Client button */}
             <Button
               onClick={() => {
                 setShowCreateRow(true);
@@ -266,7 +262,7 @@ export function ProfileManagementModal({
               className="h-9 shrink-0 gap-1.5 rounded-sm bg-brand-navy px-3 text-sm font-semibold text-white hover:bg-brand-navy-dark sm:px-4"
             >
               <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline">New Profile</span>
+              <span className="hidden sm:inline">New Client</span>
               <span className="sm:hidden">New</span>
             </Button>
           </div>
@@ -277,7 +273,7 @@ export function ProfileManagementModal({
           <div className="flex flex-1 items-center justify-center py-14">
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
             <span className="ml-2 text-sm text-muted-foreground">
-              Loading profiles…
+              Loading clients…
             </span>
           </div>
         ) : (
@@ -308,7 +304,7 @@ export function ProfileManagementModal({
                     <TableCell className="py-2 pr-2">
                       <Input
                         autoFocus
-                        placeholder="Profile name…"
+                        placeholder="Client name…"
                         value={createName}
                         onChange={(e) => setCreateName(e.target.value)}
                         onKeyDown={(e) => {
@@ -350,7 +346,7 @@ export function ProfileManagementModal({
                   </TableRow>
                 )}
 
-                {/* ── Profile rows ──────────────────────────── */}
+                {/* ── Client rows ───────────────────────────── */}
                 {paginated.length === 0 && !showCreateRow ? (
                   <TableRow>
                     <TableCell
@@ -358,21 +354,20 @@ export function ProfileManagementModal({
                       className="py-12 text-center text-sm text-muted-foreground"
                     >
                       {searchQuery
-                        ? "No profiles match your search."
-                        : "No profiles found. Create one to get started."}
+                        ? "No clients match your search."
+                        : "No clients found. Create one to get started."}
                     </TableCell>
                   </TableRow>
                 ) : (
-                  paginated.map((profile, idx) => {
+                  paginated.map((client, idx) => {
                     const rowNum = startIndex + idx + 1;
-                    const isEditing = editId === profile._id;
-                    const isDeleting = deletingId === profile._id;
-                    const anyAction =
-                      updating || !!deletingId;
+                    const isEditing = editId === client._id;
+                    const isDeleting = deletingId === client._id;
+                    const anyAction = updating || !!deletingId;
 
                     return (
                       <TableRow
-                        key={profile._id}
+                        key={client._id}
                         className="border-b border-border/40 hover:bg-muted/30"
                       >
                         {/* # */}
@@ -396,7 +391,7 @@ export function ProfileManagementModal({
                             />
                           ) : (
                             <span className="text-sm font-medium text-foreground">
-                              {profile.name}
+                              {client.name}
                             </span>
                           )}
                         </TableCell>
@@ -437,10 +432,10 @@ export function ProfileManagementModal({
                                 type="button"
                                 onClick={() => {
                                   setShowCreateRow(false);
-                                  startEdit(profile);
+                                  startEdit(client);
                                 }}
                                 disabled={anyAction}
-                                title="Edit profile"
+                                title="Edit client"
                                 className="flex h-7 w-7 items-center justify-center rounded-sm text-brand-navy transition-colors hover:bg-brand-navy/10 disabled:opacity-40"
                               >
                                 <Pencil className="h-3.5 w-3.5" />
@@ -449,9 +444,9 @@ export function ProfileManagementModal({
                               {/* Delete */}
                               <button
                                 type="button"
-                                onClick={() => handleDelete(profile)}
+                                onClick={() => handleDelete(client)}
                                 disabled={anyAction}
-                                title="Delete profile"
+                                title="Delete client"
                                 className="flex h-7 w-7 items-center justify-center rounded-sm text-red-600 transition-colors hover:bg-red-50 disabled:opacity-40"
                               >
                                 {isDeleting ? (
