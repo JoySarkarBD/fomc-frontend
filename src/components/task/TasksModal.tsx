@@ -38,7 +38,7 @@ export function TasksModal({ open, onOpenChange }: TasksModalProps) {
         {/* Content */}
         <div className="overflow-hidden">
           <div className="px-4 py-3 sm:px-6 sm:py-4">
-            <TasksModalTable />
+            <TasksModalTable tasks={[]} totalRecords={0} />
           </div>
         </div>
       </DialogContent>

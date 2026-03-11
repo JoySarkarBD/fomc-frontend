@@ -1,19 +1,26 @@
 import type { LucideIcon } from "lucide-react";
 
-/** Possible statuses for a task */
-export type TaskStatus = "todo" | "in-progress" | "completed";
+/** Possible statuses for a task (matches API enum) */
+export type TaskStatus =
+  | "PENDING"
+  | "WORK_IN_PROGRESS"
+  | "COMPLETED"
+  | "BLOCKED"
+  | "DELIVERED";
 
-/** A single task item */
+/** A single task from the API */
 export interface Task {
-  id: string;
-  title: string;
-  client: string;
-  profile: string;
-  project: string;
+  _id: string;
+  name: string;
+  project: string | { _id: string; name: string };
   dueDate: string;
+  priority: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+  description?: string;
   status: TaskStatus;
-  // Legacy field for backward compatibility with existing task list
-  date?: string;
+  assignTo?: string[];
+  createdBy?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 /** Pipeline step displayed in the task flow */

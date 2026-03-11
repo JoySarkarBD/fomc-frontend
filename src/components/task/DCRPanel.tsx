@@ -1,17 +1,9 @@
-import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { DCRCompletedTasks } from "./DCRCompletedTasks";
 import { DCRUploadArea } from "./DCRUploadArea";
-import { DEMO_TASKS } from "@/constants/task";
 
 export function DCRPanel() {
-  const completedTasks = useMemo(
-    () => DEMO_TASKS.filter((t) => t.status === "completed"),
-    [],
-  );
-
   return (
-    <div className="h-full rounded-sm bg-white p-4 shadow-sm ring-1 ring-black/5 sm:p-6">
+    <div className="rounded-sm bg-white p-4 shadow-sm ring-1 ring-black/5 sm:p-6">
       {/* Heading */}
       <h2 className="text-lg font-bold text-brand-navy/90 sm:text-xl">
         Daily Completion Report (DCR)
@@ -25,16 +17,8 @@ export function DCRPanel() {
 
       <div className="my-4 h-px bg-border/40 sm:my-6" />
 
-      {/* Completed tasks */}
-      <h3 className="mb-3 text-lg font-semibold text-foreground/90 sm:mb-4 sm:text-xl">
-        Completed Tasks
-      </h3>
-      <DCRCompletedTasks tasks={completedTasks} />
-
       {/* Upload area */}
-      <div className="mt-4 sm:mt-6">
-        <DCRUploadArea />
-      </div>
+      <DCRUploadArea />
 
       {/* Submit button */}
       <div className="mt-6 sm:mt-8">

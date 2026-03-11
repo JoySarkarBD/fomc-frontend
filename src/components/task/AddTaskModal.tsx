@@ -11,9 +11,10 @@ import { AddTaskForm } from "./AddTaskForm";
 interface AddTaskModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onTaskCreated?: () => void;
 }
 
-export function AddTaskModal({ open, onOpenChange }: AddTaskModalProps) {
+export function AddTaskModal({ open, onOpenChange, onTaskCreated }: AddTaskModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg rounded-sm border-0 p-6 shadow-xl sm:max-w-180">
@@ -23,7 +24,12 @@ export function AddTaskModal({ open, onOpenChange }: AddTaskModalProps) {
           </DialogTitle>
         </DialogHeader>
 
-        <AddTaskForm onSubmit={() => onOpenChange(false)} />
+        <AddTaskForm
+          onSubmit={() => {
+            onOpenChange(false);
+            onTaskCreated?.();
+          }}
+        />
       </DialogContent>
     </Dialog>
   );

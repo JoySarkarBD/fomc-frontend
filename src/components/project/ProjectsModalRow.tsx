@@ -62,7 +62,7 @@ export function ProjectsModalRow({
 
       {/* Project Name */}
       <TableCell className="py-3.5 text-sm font-semibold text-foreground">
-        <div className="max-w-[200px] truncate">{project.name}</div>
+        <div className="max-w-50 truncate">{project.name}</div>
         {project.orderId && (
           <div className="text-xs font-normal text-muted-foreground">
             {project.orderId}
@@ -92,7 +92,7 @@ export function ProjectsModalRow({
             href={firstFile}
             target="_blank"
             rel="noopener noreferrer"
-            className="max-w-[160px] truncate font-medium text-brand-navy underline underline-offset-2 hover:text-brand-navy-dark"
+            className="max-w-40 truncate font-medium text-brand-navy underline underline-offset-2 hover:text-brand-navy-dark"
             title={firstFile}
           >
             View File
